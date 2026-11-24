@@ -6,7 +6,7 @@
 - `index.html` : 메인 페이지
 - `styles.css` : 반응형·큰 글씨·고대비 디자인
 - `app.js` : 날짜별 일정, 지도 링크, 경비 자동계산, 체크리스트, 사진 기록
-- `assets/kyushu-hero.webp` : AI 제작 이미지(실제 관광지 사진 아님)
+- `assets/kyushu-hero.svg` : 벡터 여행 분위기 그림(실제 관광지 사진 아님)
 - `manifest.webmanifest`, `sw.js` : 홈 화면 설치·한 번 방문 후 일부 오프라인 열람 지원
 
 ## GitHub Pages 배포 방법
