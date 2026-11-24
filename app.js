@@ -10,7 +10,7 @@ const hotels = [
  {id:'hilton',day:'11/30(월)',night:'셋째 날',name:'힐튼 후쿠오카 씨호크',jp:'ヒルトン福岡シーホーク',city:'후쿠오카 / 모모치',beds:'트리플 객실 · 3명',yen:72076,meal:'조식 1인 추가요금 미확인 · 7층 이와부로 대욕장 성인 3명 ¥5,280 별도',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/',map:'Hilton Fukuoka Sea Hawk'}
 ];
 const days=[
- {id:'day1',num:'01',date:'11월 28일(토)',where:'후쿠오카공항 → 벳푸만',subtitle:'도착 당일은 관광 1곳과 올인클루시브 휴식 중심',route:['후쿠오카공항','야마다 SA','벳푸만 SA','우미지옥','마루쇼쿠 세키노에','그랜드 머큐어 벳푸완'],routeStart:'Fukuoka Airport International Terminal',routeEnd:'Grand Mercure Beppu Bay Resort & Spa',routeWay:['Yamada Service Area Downbound','Beppuwan Service Area','Umi Jigoku'],tip:'오후 소나기가 예상됩니다. 우미지옥 관람 중 비가 오면 바로 호텔로 이동하세요.',alt:'비가 오거나 부모님이 피곤하시면 우미지옥을 생략하고 벳푸만 SA에서 식사 후 호텔 라운지를 이용하세요.',stops:[
+ {id:'day1',num:'01',date:'11월 28일(토)',where:'후쿠오카공항 → 벳푸만',subtitle:'도착 당일은 관광 1곳과 올인클루시브 휴식 중심',route:['후쿠오카공항','야마다 SA','벳푸만 SA','우미지옥','마루쇼쿠 세키노에','그랜드 머큐어 벳푸완'],routeStart:'Fukuoka Airport International Terminal',routeEnd:'Grand Mercure Beppu Bay Resort & Spa',routeWay:['Yamada Service Area Downbound','Beppuwan Service Area','Umi Jigoku','Marushoku Sekinoe Beppu'],tip:'오후 소나기가 예상됩니다. 우미지옥 관람 중 비가 오면 바로 호텔로 이동하세요.',alt:'비가 오거나 부모님이 피곤하시면 우미지옥을 생략하고 벳푸만 SA에서 식사 후 호텔 라운지를 이용하세요.',stops:[
   ['07:45','인천공항 출발 · KE787','제2터미널 / 후쿠오카 09:15 도착','항공','',true],
   ['09:15~11:00','입국 심사·수하물·렌터카 인수','토요타 렌터카 인수 예약 10:30. 입국 지연 시 영업소에 연락하세요.','이동','Fukuoka Airport International Terminal',true],
   ['11:00~12:05','야마다 SA 하행','약 55~65분 운전 후 화장실과 스트레칭 15분','휴식','Yamada Service Area Downbound'],
@@ -20,7 +20,7 @@ const days=[
   ['15:50~16:20','그랜드 머큐어 벳푸완 체크인','싱글 2 + 엑스트라 1. 라운지에 먼저 들러 충분히 휴식','숙소','Grand Mercure Beppu Bay Resort & Spa',true],
   ['17:30~18:40','저녁 뷔페 · Le Sensoriel','예약한 올인클루시브 포함 여부와 좌석시간 확인','식사','Grand Mercure Beppu Bay Resort & Spa'],
   ['19:00 이후','대욕장·노천탕 이용','미끄럼 주의, 한 번에 오래 입욕하지 말고 수분 섭취','온천','Grand Mercure Beppu Bay Resort & Spa'] ]},
- {id:'day2',num:'02',date:'11월 29일(일)',where:'벳푸완 → 유후인 → 무나카타',subtitle:'유후인 솥밥과 지역 특산품 쇼핑 후 숙소에서 여유로운 오후',route:['그랜드 머큐어 벳푸완','긴린코','유후마부시 신','이온 유후인','미치노에키 무나카타','머큐어 무나카타'],routeStart:'Grand Mercure Beppu Bay Resort & Spa',routeEnd:'Mercure Fukuoka Munakata Resort & Spa',routeWay:['Kinrin Lake Yufuin','AEON Yufuin Store','Michi-no-Eki Munakata'],tip:'11/29 유후인은 아침 최저 약 -1℃ 전망입니다. 목도리·겉옷을 준비하고 호수 산책은 20~30분만 하세요.',alt:'강풍·추위가 심하면 긴린코를 차에서 잠깐 보고 점심과 쇼핑만 진행하세요. 무나카타에 도착한 뒤에는 온천·라운지 위주로 쉬세요.',stops:[
+ {id:'day2',num:'02',date:'11월 29일(일)',where:'벳푸완 → 유후인 → 무나카타',subtitle:'유후인 솥밥과 지역 특산품 쇼핑 후 숙소에서 여유로운 오후',route:['그랜드 머큐어 벳푸완','긴린코','유후마부시 신','이온 유후인','미치노에키 무나카타','머큐어 무나카타'],routeStart:'Grand Mercure Beppu Bay Resort & Spa',routeEnd:'Mercure Fukuoka Munakata Resort & Spa',routeWay:['Kinrin Lake Yufuin','Yufumabushi Shin Kinrinko Honten','AEON Yufuin Store','Michi-no-Eki Munakata'],tip:'11/29 유후인은 아침 최저 약 -1℃ 전망입니다. 목도리·겉옷을 준비하고 호수 산책은 20~30분만 하세요.',alt:'강풍·추위가 심하면 긴린코를 차에서 잠깐 보고 점심과 쇼핑만 진행하세요. 무나카타에 도착한 뒤에는 온천·라운지 위주로 쉬세요.',stops:[
   ['07:00~08:10','그랜드 머큐어 조식·체크아웃','숙박 1일 전 취소 가능 조건 재확인, 짐과 여권 점검','숙소','Grand Mercure Beppu Bay Resort & Spa'],
   ['08:15~09:30','유후인으로 이동','차량 약 60~75분 예상, 산길 날씨·주차 상황 주의','이동','Kinrin Lake Yufuin'],
   ['09:30~10:10','긴린코 호수·기념품 산책','호수 전망 중심 짧은 산책, 유노츠보 거리 기념품은 선택','관광','Kinrin Lake Yufuin'],
@@ -31,7 +31,7 @@ const days=[
   ['15:40~16:10','머큐어 후쿠오카 무나카타 체크인','싱글 2 + 소파베드 1, 라운지 15:00~18:00','숙소','Mercure Fukuoka Munakata Resort & Spa',true],
   ['17:30~18:40','Locavore 올인클루시브 저녁','뷔페 17:30~21:00, 마지막 입장 20:30(안내 기준)','식사','Mercure Fukuoka Munakata Resort & Spa'],
   ['19:00 이후','겐카이 사츠키 온천·휴식','대욕장 15:00~23:00, 마지막 입장 22:30(공식 기준)','온천','Mercure Fukuoka Munakata Resort & Spa'] ]},
- {id:'day3',num:'03',date:'11월 30일(월)',where:'무나카타 → 규슈대 → 후쿠오카',subtitle:'캠퍼스·대형몰·선물 쇼핑과 힐튼 온천까지',route:['머큐어 무나카타','규슈대 이토캠퍼스','라라포트 후쿠오카','하카타역 마잉(선택)','MARK IS 할로데이','힐튼 씨호크'],routeStart:'Mercure Fukuoka Munakata Resort & Spa',routeEnd:'Hilton Fukuoka Sea Hawk',routeWay:['Kyushu University Ito Campus','LaLaport Fukuoka','Hakata Station'],tip:'규슈대는 일반 방문이 가능하지만 강의실·연구동 출입은 제한됩니다. 임시 차량 입장료 ¥300, 라라포트는 월요일 주차 무료입니다.',alt:'체력이 떨어지면 하카타역 마잉을 생략하고 라라포트에서 기념품까지 구매하세요. 쇼핑보다 호텔 온천과 휴식을 우선합니다.',stops:[
+ {id:'day3',num:'03',date:'11월 30일(월)',where:'무나카타 → 규슈대 → 후쿠오카',subtitle:'캠퍼스·대형몰·선물 쇼핑과 힐튼 온천까지',route:['머큐어 무나카타','규슈대 이토캠퍼스','라라포트 후쿠오카','하카타역 마잉(선택)','MARK IS 할로데이','힐튼 씨호크'],routeStart:'Mercure Fukuoka Munakata Resort & Spa',routeEnd:'Hilton Fukuoka Sea Hawk',routeWay:['Kyushu University Ito Campus','LaLaport Fukuoka','Hakata Station','HalloDay MARK IS Fukuoka Momochi'],tip:'규슈대는 일반 방문이 가능하지만 강의실·연구동 출입은 제한됩니다. 임시 차량 입장료 ¥300, 라라포트는 월요일 주차 무료입니다.',alt:'체력이 떨어지면 하카타역 마잉을 생략하고 라라포트에서 기념품까지 구매하세요. 쇼핑보다 호텔 온천과 휴식을 우선합니다.',stops:[
   ['07:00~08:10','무나카타 호텔 조식·체크아웃','소파베드와 객실 짐, 충전기 확인','숙소','Mercure Fukuoka Munakata Resort & Spa'],
   ['08:15~09:45','규슈대 이토캠퍼스로 이동','차량 약 80~100분 예상. 도착 전 화장실 휴식','이동','Kyushu University Ito Campus'],
   ['09:45~10:25','규슈대학교 이토캠퍼스','대학 중앙광장·외관만 30~40분, 차량 입장 ¥300','관광','Kyushu University Ito Campus'],
