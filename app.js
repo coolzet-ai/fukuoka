@@ -182,7 +182,7 @@ function renderHotels(){
    return '<article class="card hotel-card">'
     +'<div class="hotel-media">'+hotelPhoto(m.main,m.mainAlt,m.mainLabel,'hotel-photo-main')+hotelPhoto(m.detail,m.detailAlt,m.detailLabel,'hotel-photo-side')+'</div>'
     +'<div class="hotel-card-inner"><div class="hotel-identity"><span class="hotel-number">STAY 0'+(i+1)+' · '+html(h.day)+'</span><span class="hotel-location">📍 '+html(h.city)+'</span></div>'
-    +'<h3 class="hotel-name">'+html(h.name)+'</h3>'
+    +'<h3 class="hotel-name" title="'+html(h.name)+'" aria-label="'+html(h.name)+'" tabindex="0">'+html(({grand:'그랜드 머큐어 벳푸완',munakata:'머큐어 후쿠오카 무나카타',hilton:'힐튼 후쿠오카 씨호크'})[h.id]||h.name)+'</h3>'
     +'<p class="hotel-arrival">체크인 15:00 · 체크아웃 11:00 · '+html(m.arrival)+'</p>'
     +'<div class="hotel-feature-list">'+m.features.map(v=>'<span>'+html(v)+'</span>').join('')+'</div>'
     +'<dl class="hotel-facts"><div><dt>침대 구성</dt><dd>'+html(h.beds)+'</dd></div>'
