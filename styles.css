@@ -302,3 +302,19 @@ input[type=checkbox]{min-width:28px;min-height:28px;accent-color:#166b69}
  .hotel-card{break-inside:avoid}
  .section{break-inside:avoid;page-break-inside:avoid}
 }
+
+
+/* Hotel section: clear senior-friendly entry point */
+.hotel-section-intro{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:28px 0 17px;padding:25px 26px;background:#e9f1ee;border:1px solid #cbded8;border-radius:17px;scroll-margin-top:100px}
+.hotel-section-intro .eyebrow{margin:0 0 7px;font-size:.85rem}
+.hotel-section-intro h3{font-size:1.45rem;margin:0 0 7px;color:#153b4b}
+.hotel-section-intro p:last-child{font-size:.9rem;color:#4b6370;margin:0}
+.hotel-section-intro .small-link{flex:none;display:flex;align-items:center;justify-content:center;min-height:53px;padding:10px 15px;font-size:.88rem;border:1px solid #b7d0c8;background:white}
+.hotel-photo figcaption{font-size:.77rem}
+.hotel-photo-side figcaption{display:none}
+@media(max-width:780px){
+  .hotel-section-intro{display:block;padding:21px 18px}
+  .hotel-section-intro .small-link{margin-top:13px;width:100%}
+  .hotel-section-intro h3{font-size:1.32rem}
+  .hotel-photo-main figcaption{font-size:.73rem}
+}
