@@ -5,8 +5,8 @@ const RATE_DATE = '2026-11-24';
 const DEFAULT_RATE = 8.43704; // 2026-11-24 조회, 1 JPY = 8.43704 KRW. 결제 적용환율 아님.
 const dayLabels = {day1:'11/28 · 벳푸',day2:'11/29 · 유후인·무나카타',day3:'11/30 · 후쿠오카',day4:'12/1 · 귀국'};
 const hotels = [
- {id:'grand',day:'11/28(토)',night:'첫째 날',name:'그랜드 머큐어 벳푸완 리조트 앤 스파',jp:'グランドメルキュール別府湾リゾート＆スパ',city:'벳푸완 / 히지',beds:'싱글베드 2 + 엑스트라베드 1',yen:98562.50,meal:'올인클루시브 · 저녁·조식·라운지·대욕장',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://mercure-beppuwan-resortandspa.jp/',map:'Grand Mercure Beppu Bay Resort & Spa'},
- {id:'munakata',day:'11/29(일)',night:'둘째 날',name:'머큐어 후쿠오카 무나카타 리조트 앤 스파',jp:'メルキュール福岡宗像リゾート＆スパ',city:'무나카타 / 현해탄',beds:'싱글베드 2 + 소파베드 1',yen:75173.50,meal:'올인클루시브 · 저녁·조식·라운지·대욕장',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://mercure-fukuokamunakata-resortandspa.jp/ko/all_inclusive/',map:'Mercure Fukuoka Munakata Resort & Spa'},
+ {id:'grand',day:'11/28(토)',night:'첫째 날',name:'그랜드 머큐어 벳푸완 리조트 앤 스파',jp:'グランドメルキュール別府湾リゾート＆スパ',city:'벳푸완 / 히지',beds:'싱글베드 2 + 엑스트라베드 1',yen:98562.50,meal:'올인클루시브 · 저녁·조식·라운지·대욕장',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://grand-mercure-beppubay-resortandspa.jp/ko/',map:'Grand Mercure Beppu Bay Resort & Spa'},
+ {id:'munakata',day:'11/29(일)',night:'둘째 날',name:'머큐어 후쿠오카 무나카타 리조트 앤 스파',jp:'メルキュール福岡宗像リゾート＆スパ',city:'무나카타 / 현해탄',beds:'싱글베드 2 + 소파베드 1',yen:75173.50,meal:'올인클루시브 · 저녁·조식·라운지·대욕장',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://mercure-fukuokamunakata-resortandspa.jp/ko/',map:'Mercure Fukuoka Munakata Resort & Spa'},
  {id:'hilton',day:'11/30(월)',night:'셋째 날',name:'힐튼 후쿠오카 씨호크',jp:'ヒルトン福岡シーホーク',city:'후쿠오카 / 모모치',beds:'트리플 객실 · 3명',yen:72076,meal:'조식 1인 추가요금 미확인 · 7층 이와부로 대욕장 성인 3명 ¥5,280 별도',cancel:'숙박 1일 전까지 취소 가능 (정확한 마감 시각 확인)',source:'https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/',map:'Hilton Fukuoka Sea Hawk'}
 ];
 const days=[
@@ -101,8 +101,8 @@ const sourceLinks=[
  ['일본정부관광국 JNTO','https://www.jnto.go.jp/'],
  ['Visit Japan Web','https://www.vjw.digital.go.jp/'],
  ['일본 국세청 면세 안내(한국어)','https://www.nta.go.jp/publication/pamph/shohi/menzei/201805/pdf/caution_kr.pdf'],
- ['그랜드 머큐어 벳푸완','https://mercure-beppuwan-resortandspa.jp/'],
- ['머큐어 무나카타 올인클루시브','https://mercure-fukuokamunakata-resortandspa.jp/ko/all_inclusive/'],
+ ['그랜드 머큐어 벳푸완','https://grand-mercure-beppubay-resortandspa.jp/ko/'],
+ ['머큐어 무나카타 올인클루시브','https://mercure-fukuokamunakata-resortandspa.jp/ko/'],
  ['힐튼 이와부로 대욕장 공식','https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/spa/'],
  ['규슈대학교 자유견학','https://www.kyushu-u.ac.jp/en/university/facility/campus-visit/freewalk/'],
  ['라라포트 운영시간','https://mitsui-shopping-park.com/ko/lalaport/fukuoka/hour/'],
@@ -125,7 +125,83 @@ try{state=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{state={};}
 state.checks=state.checks||{};state.stops=state.stops||{};state.fixed=state.fixed||{};state.variable=state.variable||{};state.expenses=state.expenses||[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state));}catch{notify('저장공간 부족: 백업을 권장합니다.');}}
 function notify(msg){const n=$('toast');n.textContent=msg;n.classList.add('show');clearTimeout(notify.timer);notify.timer=setTimeout(()=>n.classList.remove('show'),2600);}
-function renderHotels(){$('hotelGrid').innerHTML=hotels.map((h,i)=>`<article class="card hotel-card"><span class="hotel-number">${i+1}박 · ${h.day}</span><div class="hotel-name">${html(h.name)}</div><p class="hotel-note">${html(h.city)} · ${html(h.beds)}</p><p><strong>${html(h.meal)}</strong></p><p>취소: ${html(h.cancel)}</p><p>예약금 <strong>${yen(h.yen)}</strong> <span class="tiny">(원화 환산은 경비 탭)</span></p><div class="hotel-links"><a class="small-link" target="_blank" rel="noopener" href="${maps(h.map)}">📍 호텔 길찾기</a><a class="small-link" target="_blank" rel="noopener" href="${html(h.source)}">공식 안내 ↗</a></div></article>`).join('');}
+
+const HOTEL_MEDIA = {
+  grand: {
+    main: 'https://media.grand-mercure-beppubay-resortandspa.jp/2024/10/Open-air-bath2_Grand-Mercure-Beppu-Bay-Resort-Spa_2024414_C1N6.webp',
+    mainAlt: '그랜드 머큐어 벳푸완 리조트의 바다가 보이는 노천 대욕장',
+    mainLabel: '벳푸만 전망 노천탕 · 호텔 공식 사진',
+    detail: 'https://media.grand-mercure-beppubay-resortandspa.jp/2024/10/Superior-twin-Ocean-view_Grand-Mercure-Beppu-Bay-Resort-Spa_2024414_C1N6.webp',
+    detailAlt: '그랜드 머큐어 벳푸완의 트윈룸 예시 이미지',
+    detailLabel: '객실 유형별 구조가 다를 수 있습니다',
+    official: 'https://grand-mercure-beppubay-resortandspa.jp/ko/',
+    booking: 'https://all.accor.com/hotel/C1N6/index.en.shtml',
+    gallery: 'https://grand-mercure-beppubay-resortandspa.jp/ko/rooms/',
+    sourceLabel: '그랜드 머큐어 공식 제공',
+    features: ['벳푸만 해안 리조트', '뷔페·라운지 포함', '대욕장·노천탕'],
+    arrival: '11월 28일 토요일', bath: '대욕장·노천탕 · 숙박객 이용',
+    breakfast: '올인클루시브 식사 포함'
+  },
+  munakata: {
+    main: 'https://www.crossroadfukuoka.jp/storage/tourism_attractions/10143/responsive_images/kPfIrUMwsqDvSwxhyJJkosfWXxrVAoz5xlILbvZg__1673_1116.jpg',
+    mainAlt: '후쿠오카현 관광 공식 사이트에 실린 머큐어 무나카타 호텔 외관',
+    mainLabel: '해안 숲 속 리조트 · 후쿠오카현 관광 공식 사진',
+    detail: 'https://media.mercure-fukuokamunakata-resortandspa.jp/2026/04/fukuoka_top_spring1.webp',
+    detailAlt: '머큐어 후쿠오카 무나카타의 정원 노천온천',
+    detailLabel: '노천온천 · 호텔 공식 사진',
+    official: 'https://mercure-fukuokamunakata-resortandspa.jp/ko/',
+    booking: 'https://all.accor.com/hotel/C1N7/index.en.shtml',
+    gallery: 'https://mercure-fukuokamunakata-resortandspa.jp/ko/rooms/',
+    sourceLabel: '후쿠오카현 관광 공식·호텔 공식 제공',
+    features: ['사츠키 마쓰바라 인근', '저녁·조식·라운지 포함', '노천온천'],
+    arrival: '11월 29일 일요일', bath: '겐카이 사츠키 온천 · 노천탕',
+    breakfast: '올인클루시브 식사 포함'
+  },
+  hilton: {
+    main: 'https://www.hilton.com/im/en/FUKHIHI/21420845/fukhihi-exterior-01.jpg?ch=3333&cw=5000&gravity=NorthWest&impolicy=crop&rh=427&rw=640&xposition=0&yposition=-1',
+    mainAlt: '해안에서 바라본 힐튼 후쿠오카 씨호크 호텔 건물과 인접 돔',
+    mainLabel: '하카타만 시티뷰 · 힐튼 공식 사진',
+    detail: 'https://www.hilton.com/im/en/FUKHIHI/21420731/fukhihi-stonebath04.jpg?ch=3333&cw=5000&gravity=NorthWest&impolicy=crop&rh=427&rw=640&xposition=0&yposition=-1',
+    detailAlt: '힐튼 후쿠오카 씨호크의 7층 이와부로 대욕장 내부',
+    detailLabel: '7층 이와부로 대욕장 · 힐튼 공식 사진',
+    official: 'https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/',
+    booking: 'https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/',
+    gallery: 'https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/gallery/',
+    sourceLabel: '힐튼 공식 사진 제공',
+    features: ['하카타만 시티뷰', '트리플 예약', '이와부로 별도 요금'],
+    arrival: '11월 30일 월요일', bath: '7층 이와부로 · 3인 ¥5,280 추가',
+    breakfast: '조식 1인 추가 금액 확인 필요'
+  }
+};
+function hotelPhoto(url,alt,caption,photoClass) {
+  return '<figure class="hotel-photo '+photoClass+'"><img src="'+url+'" alt="'+html(alt)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer"><figcaption>'+html(caption)+'</figcaption><span class="photo-fallback">사진을 불러올 수 없습니다. 아래 공식 사진 링크를 이용해 주세요.</span></figure>';
+}
+function renderHotels(){
+ $('hotelGrid').innerHTML=hotels.map((h,i)=>{
+   const m=HOTEL_MEDIA[h.id];
+   return '<article class="card hotel-card">'
+    +'<div class="hotel-media">'+hotelPhoto(m.main,m.mainAlt,m.mainLabel,'hotel-photo-main')+hotelPhoto(m.detail,m.detailAlt,m.detailLabel,'hotel-photo-side')+'</div>'
+    +'<div class="hotel-card-inner"><div class="hotel-identity"><span class="hotel-number">STAY 0'+(i+1)+' · '+html(h.day)+'</span><span class="hotel-location">📍 '+html(h.city)+'</span></div>'
+    +'<h3 class="hotel-name">'+html(h.name)+'</h3>'
+    +'<p class="hotel-arrival">체크인 15:00 · 체크아웃 11:00 · '+html(m.arrival)+'</p>'
+    +'<div class="hotel-feature-list">'+m.features.map(v=>'<span>'+html(v)+'</span>').join('')+'</div>'
+    +'<dl class="hotel-facts"><div><dt>침대 구성</dt><dd>'+html(h.beds)+'</dd></div>'
+    +'<div><dt>식사</dt><dd>'+html(m.breakfast)+'</dd></div>'
+    +'<div><dt>목욕시설</dt><dd>'+html(m.bath)+'</dd></div>'
+    +'<div><dt>예약금액</dt><dd><strong>'+yen(h.yen)+'</strong> <small>원화 환산은 경비 탭</small></dd></div>'
+    +'<div><dt>취소조건</dt><dd>'+html(h.cancel)+'</dd></div></dl>'
+    +'<p class="hotel-photo-note">호텔 홍보용 사진으로, 실제 예약 객실의 전망·침구와 다를 수 있습니다. <small>사진: '+html(m.sourceLabel)+'</small></p>'
+    +'<div class="hotel-links"><a class="hotel-link-primary" target="_blank" rel="noopener noreferrer" href="'+m.official+'">공식 홈페이지 ↗</a>'
+    +'<a class="small-link" target="_blank" rel="noopener noreferrer" href="'+m.gallery+'">객실 사진 ↗</a>'
+    +'<a class="small-link" target="_blank" rel="noopener noreferrer" href="'+m.booking+'">예약 안내 ↗</a>'
+    +'<a class="small-link" target="_blank" rel="noopener noreferrer" href="'+maps(h.map)+'">📍 길찾기 ↗</a></div>'
+    +'</div></article>';
+ }).join('');
+ document.querySelectorAll('.hotel-photo img').forEach(img=>{
+  img.addEventListener('error',()=>{const fig=img.closest('figure');if(fig)fig.classList.add('photo-unavailable');});
+ });
+}
+
 function renderDays(){$('daySections').innerHTML=days.map(d=>`<article class="card day-card" id="${d.id}"><header class="day-header"><div><div class="day-kicker">DAY ${d.num} · ${d.date}</div><h3>${html(d.where)}</h3><p>${html(d.subtitle)}</p></div><div class="day-date"><b>${d.num}</b>일차</div></header><div class="day-body"><div class="day-top"><p class="day-summary">🚙 모든 이동시간은 교통·주차·부모님 휴식에 따라 달라지는 <strong>계획용 예상시간</strong>입니다.</p><a class="day-map" target="_blank" rel="noopener noreferrer" href="${routeUrl(d)}">🧭 오늘 차량 길찾기 ↗</a></div><div class="route-rail" aria-label="이동 순서">${d.route.map(x=>`<span class="route-chip">${html(x)}</span>`).join('')}</div><ol class="timeline">${d.stops.map((s,i)=>{const done=!!state.stops[d.id+'-'+i];return `<li class="stop${done?' done':''}" data-stop="${d.id}-${i}"><div class="stop-time">${html(s[0])}</div><div class="stop-detail"><div class="stop-title">${html(s[1])}</div><p class="stop-desc">${html(s[2])}</p><div class="stop-tags"><span class="stop-tag">${html(s[3])}</span>${s[5]?'<span class="stop-tag important">중요</span>':''}${s[6]?'<span class="stop-tag">선택 일정</span>':''}</div><div class="stop-actions">${s[4]?`<a target="_blank" rel="noopener noreferrer" href="${maps(s[4])}" aria-label="${html(s[1])} 지도에서 보기">📍 길찾기 ↗</a>`:''}<button type="button" class="stop-toggle" data-key="${d.id}-${i}" aria-pressed="${done}">${done?'✓ 완료됨':'□ 완료 표시'}</button></div></div></li>`;}).join('')}</ol><div class="day-tips"><div class="tip-box"><strong>💡 꼭 기억할 팁</strong>${html(d.tip)}</div><div class="tip-box warning"><strong>☔ 비·피로 시 B안</strong>${html(d.alt)}</div></div></div></article>`).join('');}
 function renderPromo(){$('promoGrid').innerHTML=promos.map(p=>`<article class="card promo-card"><div class="promo-title">${html(p.name)}</div><div class="promo-dates">${html(p.duration)}</div><p><strong>${html(p.lead)}</strong></p><p>${html(p.detail)}</p><span class="pill muted">${html(p.tag)}</span><p style="margin-top:15px"><a class="small-link" target="_blank" rel="noopener noreferrer" href="${html(p.url)}">공식 상세 안내 ↗</a></p></article>`).join('');$('souvenirGrid').innerHTML=souvenirs.map(a=>`<div class="souvenir"><strong>📦 ${html(a[0])}</strong>${html(a[1])}</div>`).join('');}
 function renderChecks(){let count=0,total=0;$('checklistGrid').innerHTML=Object.entries(checks).map(([group,arr])=>{const n=arr.filter((_,i)=>state.checks[group+'-'+i]).length;count+=n;total+=arr.length;return `<section class="card check-group"><h3>${html(group)}</h3><p class="check-progress">${n} / ${arr.length}개 완료</p>${arr.map((item,i)=>{let key=group+'-'+i;let done=!!state.checks[key];return `<label class="check-row${done?' done':''}"><input type="checkbox" data-check="${html(key)}" ${done?'checked':''}><span>${html(item)}</span></label>`;}).join('')}</section>`}).join('');$('checklist').querySelector('.section-head p:last-child').textContent=`${total}개 중 ${count}개 준비했습니다. 체크 내용은 기기에 자동 저장됩니다.`;}
