@@ -1,0 +1,452 @@
+
+/*!
+ * KYUSHU Family Journeys — Premium accessible design system
+ * V2 • 2026-11-24
+ * Visual hierarchy: Today > itinerary > weather > reservations > reference
+ * Senior-first: readable type, high-contrast copy, generous touch targets.
+ * Applied after legacy styles.css; behavior remains in app.js.
+ */
+:root{
+  --ui-canvas:#f5f7f5;
+  --ui-surface:#fff;
+  --ui-ink:#1a3742;
+  --ui-muted:#42606a;
+  --ui-teal:#176761;
+  --ui-teal-soft:#e8f3ed;
+  --ui-navy:#123e4d;
+  --ui-navy-deep:#0e303c;
+  --ui-warm:#ecbd73;
+  --ui-warm-soft:#fff6e8;
+  --ui-line:#d2e0d9;
+  --ui-shadow:0 5px 20px rgba(18,62,77,.065);
+  --ui-radius:19px;
+  --ui-content:1160px;
+  color:var(--ui-ink);
+  background:var(--ui-canvas);
+  line-height:1.62;
+}
+html,body{max-width:100%;overflow-x:clip}
+html{scroll-padding-top:85px}
+body{
+  color:var(--ui-ink);
+  background:linear-gradient(160deg,#f4f7f4 0%,#fafbf9 48%,#f2f6f3 100%);
+  line-height:1.62;
+  font-family:"Pretendard Variable",Pretendard,"Noto Sans KR",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+*{min-width:0}
+p{line-height:1.62}
+label,summary{color:var(--ui-ink)}
+a{color:#135d5c;text-underline-offset:4px}
+a:hover{color:#0f504c}
+:focus-visible{outline:3px solid #df9d41;outline-offset:4px}
+.container{width:min(var(--ui-content),calc(100% - 44px))}
+.card,.day-card,.quick-card,.weather-day,.hotel-card{border-color:var(--ui-line);box-shadow:var(--ui-shadow)}
+.card{background:var(--ui-surface);border-radius:var(--ui-radius)}
+.card p,.info-card p,.promo-card p{color:var(--ui-ink)}
+.source-note,.tiny,.card small{color:var(--ui-muted)}
+.utility-bar{
+  z-index:180;min-height:61px;padding-block:8px;
+  background:var(--ui-navy-deep);border-bottom:1px solid #335661;
+  box-shadow:0 5px 18px rgba(9,43,54,.12);
+}
+.utility-brand{font-weight:800;font-size:.96rem;color:#f6e5c7;letter-spacing:-.03em}
+.utility-btn{
+  min-height:46px;border-radius:11px;padding:8px 13px;
+  background:#234e58;color:#fff;border:1px solid #86a9ab;
+  font-size:.83rem;font-weight:750;
+}
+.utility-btn:hover{background:#37626b}
+.utility-btn[aria-pressed=true]{background:#f5d598;color:#15333e}
+.hero{
+  min-height:0;
+  border-bottom:0;
+  background:var(--ui-navy);
+}
+.hero::after{display:none}
+.hero-image{
+  background-image:
+    linear-gradient(93deg,rgba(8,42,55,.95),rgba(8,42,55,.79) 48%,rgba(8,42,55,.16) 100%),
+    url('./assets/kyushu-hero.svg');
+  background-position:center,center 54%;
+}
+.hero-content{padding:43px 0 53px}
+.hero-overline{
+  display:inline-flex;align-items:center;gap:7px;
+  margin:0 0 11px;padding:7px 12px;border-radius:99px;
+  border:1px solid rgba(254,226,165,.5);
+  background:rgba(11,48,59,.54);
+  color:#fae4b9;letter-spacing:.045em;
+  font-size:.79rem;font-weight:800;
+}
+.hero h1{
+  font-size:clamp(2.35rem,5vw,3.75rem);
+  line-height:1.13;letter-spacing:-.048em;
+  font-weight:850;margin:0 0 11px;
+  color:#fff;
+}
+.hero h1 em{color:#f0ca88}
+.hero-sub{font-size:1.01rem;line-height:1.55;font-weight:600;color:#f0f7f4;margin:0}
+.hero-buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.hero-buttons .primary-btn,.hero-buttons .outline-btn{
+  font-size:.89rem;min-height:47px;padding:9px 17px;border-radius:11px;
+  border-width:1px;
+}
+.hero-buttons .primary-btn{background:#f1c981;color:#153743}
+.hero-buttons .outline-btn{border-color:#d6e9e7;background:rgba(11,46,58,.32)}
+.hero-buttons a:focus-visible{outline-color:#ffdfa3}
+/* Main action zone — prominent but calm; no colorful summary callout. */
+.today-panel{
+  position:relative;z-index:5;
+  margin-top:-24px;padding:24px 27px 27px;
+  background:#fff;
+  border:1px solid #d1e1db;border-radius:20px;
+  box-shadow:0 14px 38px rgba(17,59,64,.13);
+  scroll-margin-top:86px;
+}
+.today-panel-heading{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin-bottom:15px;padding-bottom:12px;
+  border-bottom:1px solid #e5ece7;
+}
+.today-eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  color:#215b59;font-weight:850;font-size:.79rem;
+  letter-spacing:.06em;
+}
+.today-live-dot{
+  width:8px;height:8px;flex:none;border-radius:100%;
+  background:#21816f;box-shadow:0 0 0 4px #e7f2ed;
+}
+.today-progress{color:#345660;font-size:.83rem;font-weight:800;white-space:nowrap}
+.today-panel-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(220px,.85fr);gap:22px}
+.today-main{display:flex;flex-direction:column;align-items:flex-start}
+.today-day{
+  font-size:.86rem;color:#28675f;font-weight:850;
+  margin:0 0 6px;
+}
+.today-main h2{
+  font-size:clamp(1.4rem,2.65vw,2.05rem);
+  line-height:1.24;letter-spacing:-.04em;
+  margin:0 0 10px;color:#173c4b;
+}
+.today-description{font-size:.94rem;color:#455d67;line-height:1.48;margin:0}
+.today-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:auto;padding-top:17px}
+.today-actions a{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:10px 16px;border-radius:11px;
+  text-decoration:none;font-size:.86rem;font-weight:800;line-height:1.3;
+}
+.today-action-primary{color:#fff;background:#165b60}
+.today-action-primary:hover{color:#fff;background:#0f4750}
+.today-action-secondary{background:#f0f6f2;color:#1b5f5b;border:1px solid #c7ddd4}
+.today-hotel{
+  display:flex;flex-direction:column;
+  padding:19px;border-radius:15px;
+  background:linear-gradient(135deg,#f2f6ed,#e9f3ee);
+  border:1px solid #cadfd5;
+}
+.today-hotel-top{font-size:.81rem;color:#45645f;font-weight:750;margin-bottom:8px}
+.today-hotel strong{font-size:1.23rem;line-height:1.38;font-weight:850;color:#183f4a}
+.today-hotel p{font-size:.87rem;color:#466263;margin:8px 0 0}
+.today-hotel a{display:inline-flex;align-items:center;min-height:44px;align-self:flex-start;margin-top:auto;padding-top:11px;font-size:.86rem;font-weight:850}
+.quick-info{
+  margin:13px 0 0;z-index:1;
+  grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+}
+a.quick-card{
+  min-height:78px;padding:12px;
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;color:var(--ui-ink);
+  background:#fff;border:1px solid var(--ui-line);
+  border-radius:14px;box-shadow:none;
+  transition:background-color .16s,border-color .16s;
+}
+a.quick-card:hover{background:#edf7f2;border-color:#9bc7b7}
+.quick-card .quick-icon{
+  flex:0 0 37px;width:37px;height:37px;border-radius:10px;
+  font-size:1.22rem;display:grid;place-items:center;
+  background:#edf5ef;
+}
+.quick-card>div{flex:1;min-width:0}
+.quick-card strong{font-size:.88rem;color:#204653;white-space:nowrap}
+.quick-card small{font-size:.72rem;color:#4c676e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick-arrow{font-size:.86rem;font-weight:700;color:#398076;margin-left:auto}
+.notice{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;margin:18px 0 3px;
+  border-radius:13px;background:#e9f3ef;border:1px solid #cce2d6;
+  border-left:5px solid #2e756b;box-shadow:none;
+}
+.notice strong{color:#19574f;font-size:.9rem;flex:none}
+.notice span{font-size:.87rem;line-height:1.5;color:#24484d}
+.section{margin-top:50px;scroll-margin-top:82px}
+.section-head{
+  margin-bottom:17px;padding:0 0 13px 0;
+  border-bottom:1px solid #cadbd4;
+  display:flex;align-items:flex-end;gap:16px;
+}
+.section-head:before{display:none}
+.section-head .eyebrow{
+  font-size:.75rem;color:#226c65;letter-spacing:.045em;
+  text-transform:uppercase;margin:0 0 3px;
+}
+.section-head h2{
+  color:#173d4b;font-size:clamp(1.63rem,3.25vw,2.1rem);
+  line-height:1.23;margin:.08rem 0 .3rem;
+}
+.section-head>div>p:last-child{font-size:.88rem;color:#4b636b;margin:0;line-height:1.48}
+.section-head .secondary-btn{margin-bottom:1px}
+.secondary-btn,.primary-btn,.outline-btn,.small-link,
+.day-map,.hotel-links a{
+  min-height:48px;font-weight:800;
+  border-radius:11px;
+}
+.secondary-btn{
+  background:#e8f3ee;border:1px solid #b5d5c9;
+  color:#155b59;padding:9px 15px;font-size:.88rem;
+}
+.card h3{color:#1b4150}
+.info-card{border-top:3px solid #5b9e92}
+.info-card p{font-size:.9rem}
+.weather-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.weather-day{background:#fff;border:1px solid var(--ui-line);border-left:4px solid #53a298;box-shadow:none;padding:11px 12px}
+.weather-one-line strong.weather-place{font-size:.86rem;color:#234b55}
+.weather-reading{font-size:.86rem;color:#1e5660}
+.weather-rain{background:#f0f6f2;color:#245762}
+.source-note,.tiny{font-size:.75rem;line-height:1.5;color:#4e676d}
+.flight-card{border-top:3px solid #68a79f}
+.flight-route strong{font-size:clamp(1.75rem,3.5vw,2.25rem);color:#1a4855}
+.rental-strip{background:#eaf2ee;border:1px solid #d2e2d9;color:#24474e;font-size:.85rem}
+.pill{font-size:.77rem;color:#1a615a;background:#e9f4ef}
+.hotel-grid{gap:14px}
+.hotel-card{border-radius:17px}
+.hotel-media{height:190px}
+.hotel-card-inner{padding:17px}
+.hotel-card .hotel-name{color:#173d4a;font-weight:850}
+.hotel-number{background:#e8f1eb;color:#185a58}
+.hotel-feature-list span{border-color:#d9e5db}
+.hotel-links a{font-size:.78rem}
+.hotel-links .hotel-link-primary{background:#155961}
+.hotel-facts dd{color:#244650}
+.days-jump{
+  position:sticky;top:60px;z-index:80;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;padding:9px;
+  margin:0 0 17px;border-radius:14px;
+  background:rgba(245,248,245,.97);border:1px solid #d7e2dc;
+  box-shadow:0 3px 10px rgba(18,56,65,.035);
+}
+.days-jump a{
+  min-height:46px;border-radius:9px;border:1px solid #cfdfd6;
+  background:#fff;color:#234b55;font-size:.9rem;font-weight:850;
+}
+.days-jump a:hover{background:#ecf5ef}
+.days-jump a[aria-current="date"]{background:#145963;color:#fff;border-color:#145963}
+.day-card{
+  overflow:hidden;background:#fff;border:1px solid #cfdfd6;
+  border-radius:17px;margin-bottom:20px;box-shadow:0 6px 24px rgba(17,59,64,.06);
+}
+.day-card .day-header{
+  background:#164858;
+  padding:18px 22px;align-items:center;
+}
+.day-card.is-complete .day-header{background:#22655c}
+.day-kicker{color:#f4d6a1;font-size:.8rem;letter-spacing:.018em}
+.day-header h3{font-size:1.32rem;line-height:1.33;margin:3px 0 4px;color:#fff}
+.day-header p{font-size:.85rem;line-height:1.5;color:#e4eeee}
+.day-status{border-color:#8db4b0;font-size:.75rem}
+.day-header-actions button{
+  min-height:47px;padding:9px 12px;border-radius:9px;font-size:.81rem;
+}
+.day-complete-toggle{background:#f3d39a;color:#173b44}
+.day-collapse-toggle{background:#0c3543;color:#fff}
+.day-body{padding:19px}
+.day-content-grid{gap:18px}
+.day-aside{gap:11px}
+.day-aside section{border-color:#d5e3da;border-radius:13px;background:#f8faf8}
+.day-aside h4{font-size:1rem;color:#214955}
+.day-weather-panel{background:#eef6f1!important}
+.day-route-panel{background:#fafbf9!important}
+.day-spot-panel{background:#f8faf8!important}
+.day-brief-panel{background:#fffaf0!important}
+.day-map{background:#f9eedd;color:#715321;border:1px solid #e5d3b3}
+.route-chip{background:#eef5f0;border-color:#d4e2d9;color:#1d5b58;font-weight:750}
+.stop{padding-bottom:13px}
+.stop-time{
+  background:#ebf3ef;color:#155b58;border-radius:10px;
+  font-size:.8rem;line-height:1.4;
+}
+.stop-title{font-weight:850;font-size:1.03rem;color:#1d424f;line-height:1.42}
+.stop-desc{font-size:.91rem;color:#435f68}
+.stop.meal-stop .stop-time{background:#fff0d6;color:#7b5321}
+.stop-actions a,.stop-actions button{min-height:47px;font-size:.83rem}
+.stop-actions button{border-color:#b8d5cb}
+.stop-actions a{background:#e9f3ed}
+.tip-box{background:#eff5ef;font-size:.89rem}
+.tip-box.warning{background:#fff6e9}
+.day-highlight{border-radius:10px}
+.day-highlight h5{font-size:.9rem}
+.day-highlight li{font-size:.79rem}
+.day-spot-photo{border-radius:11px}
+.day-spot-photo figcaption strong{color:#1d4352}
+.route-map-stage{border-color:#c7d9d0;border-radius:11px}
+.route-map-link{background:#155b61;color:#fff}
+.route-map-link:hover{background:#103e48;color:#fff}
+.promo-card{border-top:3px solid #9db5a1}
+.promo-card .promo-title{color:#214551}
+.check-group{border-top:3px solid #9bc6b7}
+.check-row{font-size:.98rem;font-weight:700;color:#1e424f}
+.check-row input{min-width:27px;min-height:27px}
+.rate-bar{background:#e9f2ec;border:1px solid #d0e1d7}
+.stat{border-radius:13px;background:#164d59}
+.stat:nth-child(2){background:#236c64}
+.stat:nth-child(3){background:#665738}
+.cost-row{border-color:#e3ebe4}
+.cost-row>label{color:#244753;font-size:.91rem}
+.cost-row small{font-size:.76rem;color:#516c73}
+.summary-line{background:#fff3db}
+.source-grid a{border-color:#d1e1d8;background:#fff}
+.source-grid a:hover{background:#eaf4ee}
+.footer{color:#506973}
+.footer strong{color:#174653}
+.bottom-nav{border-top:1px solid #d4e2da;background:#fff}
+.bottom-nav a{color:#234e58}
+.bottom-nav a:focus-visible,.bottom-nav a:hover{background:#e9f4ec}
+.toast{background:#133f4c;color:#fff}
+.high-contrast{color:#112a36;background:#fff;--ui-muted:#294550;--ui-line:#607f81}
+.high-contrast .today-panel,.high-contrast .day-card,.high-contrast .quick-card,.high-contrast .card{border:2px solid #527a7b}
+.high-contrast .today-description,.high-contrast .stop-desc{color:#203f4e}
+.large-text{font-size:22px}
+.large-text .today-description,.large-text .stop-desc,.large-text .check-row{font-size:1.07rem}
+.large-text .today-actions a,.large-text .day-header-actions button{font-size:.96rem}
+/* Tablet: keep hierarchy, allow the aside to breathe. */
+@media(max-width:1050px){
+  .container{width:calc(100% - 34px)}
+  .today-panel-grid{grid-template-columns:minmax(0,1.3fr) minmax(200px,.8fr);gap:16px}
+  .today-panel{padding:20px}
+  .quick-card{padding:10px}
+  .quick-card .quick-icon{flex:0 0 33px;width:33px;height:33px}
+  .quick-card strong{font-size:.8rem}
+  .quick-card small{font-size:.69rem}
+  .day-content-grid{grid-template-columns:minmax(0,1.43fr) minmax(235px,.82fr);gap:13px}
+}
+@media(max-width:770px){
+  :root{font-size:18px}
+  .container{width:calc(100% - 22px)}
+  .utility-bar{position:sticky;min-height:58px;padding:7px 11px}
+  .utility-brand{font-size:.81rem}
+  .utility-btn{min-height:44px;padding:7px 9px;font-size:.76rem}
+  .hero-content{padding:28px 0 41px}
+  .hero h1{font-size:clamp(2.03rem,8.4vw,2.7rem);margin-bottom:9px}
+  .hero-overline{font-size:.68rem;padding:6px 9px}
+  .hero-sub{font-size:.91rem;line-height:1.48}
+  .hero-buttons{margin-top:13px;gap:6px}
+  .hero-buttons .primary-btn,.hero-buttons .outline-btn{font-size:.8rem;min-height:46px;padding:8px 11px}
+  .today-panel{margin-top:-19px;padding:16px;border-radius:16px}
+  .today-panel-heading{gap:8px;padding-bottom:10px;margin-bottom:12px}
+  .today-eyebrow{font-size:.69rem;letter-spacing:0}
+  .today-progress{font-size:.71rem}
+  .today-panel-grid{grid-template-columns:1fr;gap:12px}
+  .today-main h2{font-size:1.43rem;margin-bottom:7px}
+  .today-day{font-size:.81rem}
+  .today-description{font-size:.88rem}
+  .today-actions{margin-top:12px;padding-top:0;gap:7px}
+  .today-actions a{min-height:49px;font-size:.78rem;padding:9px 10px;flex:1 1 auto}
+  .today-hotel{padding:13px 15px}
+  .today-hotel-top{font-size:.77rem;margin-bottom:5px}
+  .today-hotel strong{font-size:1.06rem}
+  .today-hotel p{font-size:.8rem;margin-top:4px}
+  .today-hotel a{font-size:.8rem;margin-top:2px;padding-top:5px;min-height:38px}
+  .quick-info{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
+  a.quick-card{min-height:66px;padding:9px 10px;gap:7px}
+  .quick-card .quick-icon{width:29px;height:29px;flex:0 0 29px;font-size:1rem}
+  .quick-card strong{font-size:.79rem}
+  .quick-card small{font-size:.68rem}
+  .quick-arrow{font-size:.69rem}
+  .notice{display:block;padding:12px 14px;margin:13px 0 0}
+  .notice strong{display:block;margin-bottom:4px;font-size:.84rem}
+  .notice span{font-size:.83rem}
+  .section{margin-top:37px;scroll-margin-top:72px}
+  .section-head{padding-bottom:10px;margin-bottom:14px;align-items:stretch}
+  .section-head .eyebrow{font-size:.7rem}
+  .section-head h2{font-size:1.52rem}
+  .section-head>div>p:last-child{font-size:.81rem}
+  .card{padding:15px}
+  .days-jump{top:58px;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:6px;margin-bottom:11px;border-radius:10px}
+  .days-jump a{min-height:45px;font-size:.73rem;border-radius:7px;padding:5px 2px}
+  .day-card{margin-bottom:14px;border-radius:13px}
+  .day-card .day-header{padding:14px}
+  .day-header h3{font-size:1.14rem}
+  .day-header p{font-size:.79rem}
+  .day-header-actions{gap:7px}
+  .day-header-actions button{min-height:47px;font-size:.8rem}
+  .day-body{padding:12px}
+  .day-content-grid{display:flex;flex-direction:column;gap:13px}
+  .day-aside{order:-1;width:100%;gap:9px}
+  .day-aside section{padding:12px}
+  .day-aside h4{font-size:.91rem}
+  .day-route-panel{order:0}
+  .day-weather-panel{order:-1}
+  .day-spot-panel{order:1}
+  .day-brief-panel{order:2}
+  .day-primary{width:100%}
+  .route-map-stage{height:188px}
+  .route-chip{font-size:.73rem}
+  .stop-title{font-size:.94rem}
+  .stop-desc{font-size:.85rem;line-height:1.48}
+  .stop-time{font-size:.74rem}
+  .stop-actions a,.stop-actions button{min-height:46px;font-size:.77rem}
+  .day-spot-panel{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .day-spot-panel h4{grid-column:1/-1}
+  .day-spot-photo img{aspect-ratio:5/3}
+  .day-spot-photo figcaption strong{font-size:.83rem}
+  .day-spot-photo figcaption span{font-size:.73rem}
+  .day-highlight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .day-highlight li{font-size:.74rem}
+  .weather-grid{grid-template-columns:1fr}
+  .weather-day{padding:9px 10px}
+  .weather-one-line strong.weather-place{font-size:.83rem}
+  .weather-reading{font-size:.84rem}
+  .weather-rain{font-size:.75rem}
+  .hotel-media{height:185px}
+  .hotel-card-inner{padding:15px}
+  .hotel-card .hotel-name{font-size:1.05rem}
+  .flight-grid,.hotel-grid,.basic-grid,.promo-grid,.checklist-grid{grid-template-columns:1fr}
+  .bottom-nav{
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    padding:5px 5px calc(5px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 19px rgba(12,56,62,.09);
+  }
+  .bottom-nav a{min-height:56px;gap:2px;font-size:.79rem}
+  .bottom-nav a span{font-size:1.25rem}
+  .footer{padding-bottom:105px}
+}
+@media(max-width:395px){
+  .today-panel{padding:14px}
+  .today-eyebrow{font-size:.65rem}
+  .today-progress{font-size:.68rem}
+  .today-actions{display:grid;grid-template-columns:1fr}
+  .today-actions a{width:100%;min-height:47px}
+  .quick-info{gap:6px}
+  a.quick-card{padding:8px 6px}
+  .quick-card .quick-icon{width:25px;height:25px;flex:0 0 25px}
+  .quick-card strong{font-size:.73rem}
+  .quick-card small{font-size:.65rem}
+  .days-jump{gap:4px}
+  .days-jump a{font-size:.69rem}
+  .day-weather-row .weather-one-line strong{font-size:.7rem}
+  .day-weather-row .weather-reading{font-size:.71rem}
+  .day-weather-row .weather-rain{font-size:.65rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .quick-card,.today-actions a,.hotel-photo img{transition:none}
+}
+@media print{
+  .today-panel{margin-top:0;box-shadow:none}
+  .today-actions,.utility-bar,.bottom-nav,.hero-buttons,.days-jump{display:none!important}
+  .day-body[hidden]{display:block!important}
+  .day-content-grid{display:grid;grid-template-columns:minmax(0,1fr) 240px}
+  .section{break-inside:auto}
+  .day-card,.hotel-card{break-inside:avoid}
+}
