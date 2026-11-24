@@ -450,3 +450,26 @@ a.quick-card:hover{background:#edf7f2;border-color:#9bc7b7}
   .section{break-inside:auto}
   .day-card,.hotel-card{break-inside:avoid}
 }
+
+
+/* Robust 320px and zoom support: let status stack, not spill horizontally. */
+@media(max-width:420px){
+  .today-panel-heading{flex-wrap:wrap;align-items:flex-start}
+  .today-progress{white-space:normal;line-height:1.35}
+  .today-hotel strong{overflow-wrap:anywhere}
+  .section-head{flex-wrap:wrap}
+  .section-head .secondary-btn{max-width:100%}
+  .day-header-actions button{white-space:normal;line-height:1.25}
+}
+body.large-text .today-main h2{font-size:clamp(1.7rem,4.4vw,2.3rem)}
+body.large-text .today-day,
+body.large-text .today-progress,
+body.large-text .today-hotel p,
+body.large-text .quick-card strong,
+body.large-text .days-jump a{font-size:.98rem}
+body.large-text .stop-title{font-size:1.2rem}
+body.large-text .stop-time{font-size:.92rem}
+body.large-text .day-weather-row .weather-one-line strong,
+body.large-text .day-weather-row .weather-reading,
+body.large-text .day-weather-row .weather-rain{font-size:.8rem}
+body.large-text .day-spot-photo figcaption span{font-size:.92rem}
