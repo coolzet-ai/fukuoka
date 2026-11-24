@@ -122,7 +122,7 @@ function maps(q){return 'https://www.google.com/maps/search/?api=1&query='+encod
 function routeUrl(d){return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+encodeURIComponent(d.routeStart)+'&destination='+encodeURIComponent(d.routeEnd)+'&waypoints='+encodeURIComponent(d.routeWay.join('|'));}
 let state;
 try{state=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{state={};}
-state.checks=state.checks||{};state.stops=state.stops||{};state.dayCompleted=state.dayCompleted||{};state.dayCollapsed=state.dayCollapsed||{};state.fixed=state.fixed||{};state.variable=state.variable||{};state.expenses=state.expenses||[];
+state.checks=state.checks||{};state.stops=state.stops||{};state.dayCompleted=state.dayCompleted||{};state.dayCollapsed=state.dayCollapsed||{};state.dayFilters=state.dayFilters||{};state.fixed=state.fixed||{};state.variable=state.variable||{};state.expenses=state.expenses||[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state));}catch{notify('저장공간 부족: 백업을 권장합니다.');}}
 function notify(msg){const n=$('toast');n.textContent=msg;n.classList.add('show');clearTimeout(notify.timer);notify.timer=setTimeout(()=>n.classList.remove('show'),2600);}
 
@@ -391,7 +391,7 @@ function routeMapFallback(dayId){
 }
 function routeMapPanel(d){
  const places=DAY_ROUTE_MAPS[d.id]||[];
- return '<section class="day-route-panel" aria-label="'+html(d.date)+' 이동 동선지도">'
+ return '<section id="day-route-'+d.id+'" class="day-route-panel" aria-label="'+html(d.date)+' 이동 동선지도">'
   +'<h4>🗺️ 오늘의 동선지도</h4>'
   +'<div class="route-map-stage" id="route-map-'+d.id+'" data-route-map="'+d.id+'">'+routeMapFallback(d.id)+'</div>'
   +'<ol class="route-map-place-list" aria-label="주요 방문 순서">'
@@ -453,7 +453,7 @@ function renderDays(){
  $('daySections').innerHTML=days.map(d=>{
   const completed=!!state.dayCompleted[d.id],collapsed=!!state.dayCollapsed[d.id];
   const panelId='day-panel-'+d.id;
-  return '<article class="card day-card'+(completed?' is-complete':'')+'" id="'+d.id+'">'
+  return '<article class="card day-card'+(completed?' is-complete':'')+'" id="'+d.id+'" data-filter="'+html(state.dayFilters[d.id]||'all')+'">'
    +'<header class="day-header"><div class="day-heading"><div class="day-kicker">DAY '+d.num+' · '+html(d.date)+'</div>'
    +'<h3>'+html(d.where)+'</h3><p>'+html(d.subtitle)+'</p></div>'
    +'<div class="day-header-actions"><span class="day-status'+(completed?' complete':'')+'">'+(completed?'✓ 여행 완료':'진행 예정')+'</span>'
@@ -464,8 +464,11 @@ function renderDays(){
    +'<div class="day-content-grid"><div class="day-primary">'
    +'<div class="day-top"><p class="day-summary">🚙 이동시간은 교통·주차·부모님 휴식에 따라 달라지는 <strong>예상 시간</strong>입니다.</p>'
    +'<a class="day-map" target="_blank" rel="noopener noreferrer" href="'+routeUrl(d)+'">🧭 오늘 차량 길찾기 ↗</a></div>'
+   +'<div class="day-mobile-strip" aria-label="오늘 간편 정보"><div class="mobile-weather-snapshot"><span>🌤️ 오늘 날씨</span><div data-day-weather="'+d.id+'">'+dayWeatherMarkup(d.id)+'</div></div><a href="#day-route-'+d.id+'" class="mobile-route-jump" aria-label="'+html(d.date)+' 동선지도 보기">🗺️ 지도 보기</a></div>'
    +'<div class="route-rail" aria-label="이동 순서">'+d.route.map(x=>'<span class="route-chip">'+html(x)+'</span>').join('')+'</div>'
-   +'<div class="timeline-title"><h4>시간순 전체 일정</h4><p><span class="type-key sight-key">관광·쇼핑</span><span class="type-key meal-key">식사·카페</span>로 구분했습니다.</p></div>'
+   +'<div class="timeline-title"><h4>시간순 전체 일정</h4><p><span class="type-key sight-key">관광·쇼핑</span><span class="type-key meal-key">식사·카페</span></p></div>'
+   +'<div class="day-filters" role="group" aria-label="'+html(d.date)+' 일정 종류 선택">'
+   +[['all','전체'],['sight','관광·쇼핑'],['meal','식사·카페']].map(([value,label])=>'<button class="day-filter-btn" type="button" data-day-filter="'+d.id+'" data-filter-value="'+value+'" aria-pressed="'+((state.dayFilters[d.id]||'all')===value)+'">'+label+'</button>').join('')+'</div>'
    +'<ol class="timeline">'+d.stops.map((s,i)=>dayStopRow(d,s,i)).join('')+'</ol>'
    +'<div class="day-tips"><div class="tip-box"><strong>💡 꼭 기억할 팁</strong>'+html(d.tip)+'</div>'
    +'<div class="tip-box warning"><strong>☔ 비·피로 시 B안</strong>'+html(d.alt)+'</div></div>'
@@ -535,12 +538,30 @@ function setupEvents(){
     document.querySelector('#'+id+' .day-collapse-toggle')?.focus({preventScroll:true});
     return;
   }
+  const filter=e.target.closest('button.day-filter-btn');
+  if(filter){
+    const id=filter.dataset.dayFilter;
+    const value=filter.dataset.filterValue;
+    state.dayFilters[id]=value;
+    save();
+    const card=document.getElementById(id);
+    if(card){
+      card.dataset.filter=value;
+      card.querySelectorAll('button.day-filter-btn').forEach(btn=>{
+        btn.setAttribute('aria-pressed',String(btn.dataset.filterValue===value));
+      });
+    }
+    return;
+  }
   const b=e.target.closest('button.stop-toggle');
   if(!b)return;
   const k=b.dataset.key;
-  state.stops[k]=!state.stops[k];
-  save();renderDays();
-  document.querySelector('button.stop-toggle[data-key="'+k+'"]')?.focus({preventScroll:true});
+  const isDone=!state.stops[k];
+  state.stops[k]=isDone;
+  save();
+  b.setAttribute('aria-pressed',String(isDone));
+  b.textContent=isDone?'✓ 완료됨':'□ 완료 표시';
+  b.closest('.stop')?.classList.toggle('done',isDone);
   notify('일정 완료 표시를 저장했습니다.');
  });
  $('checklistGrid').addEventListener('change',e=>{if(!e.target.matches('[data-check]'))return;state.checks[e.target.dataset.check]=e.target.checked;save();renderChecks();});
