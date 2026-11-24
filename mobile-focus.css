@@ -1,0 +1,326 @@
+
+/*
+ * KYUSHU Journey — Mobile readability revision v3
+ * Purpose: timeline first, lightweight overview, robust 320–430 px layouts.
+ * Follows senior-design.css, no destructive changes to booking data.
+ */
+:root{
+ --m-ink:#1b3c48;
+ --m-secondary:#385866;
+ --m-rule:#d2e2d9;
+ --m-action:#145d61;
+ --m-focus:#e6a64a;
+}
+.day-mobile-strip{display:none}
+.day-filters{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:8px;margin:5px 0 17px;
+ padding:5px;background:#eff5f1;border:1px solid #d1e2d9;border-radius:12px;
+}
+.day-filter-btn{
+ display:flex;align-items:center;justify-content:center;
+ min-height:47px;padding:7px 10px;
+ background:transparent;color:#2e555b;
+ border:1px solid transparent;border-radius:9px;
+ font:800 .86rem/1.3 "Pretendard Variable","Noto Sans KR",system-ui,sans-serif;
+ cursor:pointer;white-space:normal;word-break:keep-all;
+}
+.day-filter-btn[aria-pressed="true"]{
+ background:#fff;color:#125b5b;border-color:#a8d0be;
+ box-shadow:0 2px 7px rgba(14,68,70,.08);
+}
+.day-filter-btn:focus-visible{
+ outline:3px solid var(--m-focus);outline-offset:2px;
+}
+.day-card[data-filter="meal"] .stop:not(.meal-stop),
+.day-card[data-filter="sight"] .stop:not(.sight-stop){display:none!important}
+.day-card[data-filter="meal"] .timeline:before,
+.day-card[data-filter="sight"] .timeline:before{opacity:.45}
+@media(max-width:770px){
+ html{scroll-padding-top:116px}
+ body{
+  font-size:18px;line-height:1.57;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+ }
+ .container{width:calc(100% - 20px)}
+ .utility-bar{
+  min-height:56px;padding:6px 10px;
+  box-shadow:none;
+ }
+ .utility-brand{font-size:.86rem}
+ .utility-btn{min-height:46px;padding:7px 10px;font-size:.81rem;line-height:1.35}
+ .hero{
+  min-height:0;
+  border-bottom:1px solid #2c5d65;
+ }
+ .hero-content{padding:23px 0 30px}
+ .hero-image{
+  background-position:center,center;
+  background-image:
+   linear-gradient(94deg,rgba(9,42,55,.97),rgba(9,42,55,.81) 75%,rgba(9,42,55,.52)),
+   url('./assets/kyushu-hero.svg');
+ }
+ .hero-overline{padding:4px 8px;margin:0 0 8px;font-size:.76rem;line-height:1.35}
+ .hero h1{font-size:clamp(1.95rem,7.5vw,2.34rem);margin:0 0 8px;line-height:1.13}
+ .hero-sub{font-size:.9rem;line-height:1.43;max-width:32em}
+ /* The next card provides the same actions; remove duplicate controls from hero. */
+ .hero-buttons{display:none}
+ .today-panel{
+  margin-top:-13px;padding:14px 15px;
+  border-radius:15px;box-shadow:0 6px 17px rgba(14,58,67,.09);
+ }
+ .today-panel-heading{
+  margin-bottom:9px;padding-bottom:8px;align-items:center;
+ }
+ .today-eyebrow{font-size:.76rem;letter-spacing:0}
+ .today-progress{font-size:.77rem}
+ .today-panel-grid{gap:8px}
+ .today-day{font-size:.87rem;margin:0 0 4px}
+ .today-main h2{
+  font-size:clamp(1.35rem,5.3vw,1.7rem);
+  line-height:1.27;margin:0 0 4px;
+ }
+ .today-description{font-size:.91rem;line-height:1.45}
+ .today-actions{
+  display:grid;grid-template-columns:1.2fr 1fr;
+  gap:8px;margin-top:12px;
+ }
+ .today-actions a{
+  min-height:50px;padding:9px 10px;
+  font-size:.89rem;line-height:1.25;
+  text-align:center;word-break:keep-all;
+ }
+ .today-hotel{
+  display:block;padding:10px 12px;border-radius:11px;
+  background:#f2f6f2;
+ }
+ .today-hotel-top{font-size:.79rem;margin:0 0 3px}
+ .today-hotel strong{
+  display:block;font-size:1rem;line-height:1.32;
+ }
+ .today-hotel p{font-size:.83rem;line-height:1.4;margin:4px 0 0}
+ .today-hotel a{font-size:.84rem;min-height:38px;padding-top:4px}
+ .quick-info{margin:9px 0 0;gap:7px}
+ a.quick-card{min-height:61px;padding:8px;gap:7px;border-radius:11px}
+ .quick-card .quick-icon{
+  flex:0 0 28px;width:28px;height:28px;
+  font-size:1rem;border-radius:8px
+ }
+ .quick-card strong{font-size:.83rem;line-height:1.3}
+ .quick-card small{font-size:.73rem;line-height:1.35}
+ .quick-arrow{font-size:.8rem}
+ .notice{
+  margin:9px 0 0;padding:9px 12px;
+  border-width:1px 1px 1px 4px;border-radius:11px;
+ }
+ .notice strong{font-size:.85rem;margin:0 0 2px}
+ .notice span{font-size:.84rem;line-height:1.4}
+ .section{margin-top:28px;scroll-margin-top:109px}
+ #schedule{margin-top:29px}
+ .section-head{margin-bottom:11px;padding-bottom:8px}
+ .section-head h2{font-size:1.44rem;line-height:1.28;margin-bottom:4px}
+ .section-head>div>p:last-child{font-size:.84rem;line-height:1.45}
+ /* Fast date access remains above the scrolled day cards. */
+ .days-jump{
+  position:sticky;top:56px;
+  z-index:90;padding:6px;gap:6px;
+  margin-bottom:11px;
+  background:rgba(245,248,246,.97);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+ }
+ .days-jump a{
+  min-height:46px;padding:6px 1px;
+  font-size:.79rem;font-weight:850;
+  border-radius:8px;white-space:nowrap;
+ }
+ .day-card{scroll-margin-top:115px;margin-bottom:13px}
+ .day-card .day-header{padding:12px 13px}
+ .day-kicker{font-size:.82rem}
+ .day-header h3{font-size:1.19rem;line-height:1.28;margin:2px 0 4px}
+ .day-header p{font-size:.84rem;line-height:1.4}
+ .day-header-actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;
+  width:100%;justify-content:stretch;
+ }
+ .day-status{
+  grid-column:1/-1;justify-self:start;
+  min-height:29px;padding:4px 9px;
+  font-size:.76rem;
+ }
+ .day-header-actions button{
+  width:100%;min-height:48px;
+  padding:9px 8px;font-size:.84rem;white-space:normal;
+ }
+ .day-body{padding:11px 12px}
+ /* Primary timeline must appear before maps and gallery on handheld devices. */
+ .day-content-grid{
+  display:flex;flex-direction:column;
+  gap:12px;max-width:100%;
+ }
+ .day-primary{order:-1;width:100%;min-width:0}
+ .day-aside{
+  order:0;width:100%;min-width:0;
+  display:flex;flex-direction:column;gap:10px;
+ }
+ .day-aside .day-weather-panel{display:none}
+ .day-aside .day-brief-panel{display:none}
+ .day-aside .day-route-panel{order:0}
+ .day-aside .day-spot-panel{order:1}
+ .day-mobile-strip{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;gap:7px;
+  margin:0 0 10px;padding:10px;
+  background:#eaf3ef;border:1px solid #bfdad0;
+  border-radius:12px;
+ }
+ .mobile-weather-snapshot{min-width:0}
+ .mobile-weather-snapshot>span{
+  display:block;color:#285f60;font-size:.76rem;
+  font-weight:850;margin-bottom:4px;
+ }
+ .mobile-weather-snapshot .day-weather-row{
+  background:none;border:0;border-radius:0;
+  padding:0;max-width:100%;
+ }
+ .mobile-weather-snapshot .day-weather-row+.day-weather-row{margin-top:5px}
+ .mobile-weather-snapshot .weather-one-line{
+  display:grid;grid-template-columns:minmax(0,1fr) auto auto;
+  gap:4px;width:100%;min-width:0;
+ }
+ .mobile-weather-snapshot .weather-place{
+  font-size:.79rem!important;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ }
+ .mobile-weather-snapshot .weather-reading{font-size:.8rem}
+ .mobile-weather-snapshot .weather-rain{
+  font-size:.72rem;background:#fff;border:1px solid #d6e4d9;
+  border-radius:5px;padding:2px 4px;
+ }
+ .mobile-route-jump{
+  display:flex;align-items:center;justify-content:center;
+  min-width:81px;min-height:48px;
+  padding:7px 9px;border-radius:9px;
+  background:#155a62;color:#fff;text-decoration:none;
+  font-size:.83rem;font-weight:850;line-height:1.25;
+  text-align:center;white-space:nowrap;
+ }
+ .mobile-route-jump:hover{color:#fff;background:#124e56}
+ #daySections .day-primary .day-top{
+  display:grid;grid-template-columns:1fr;
+  gap:5px;margin-bottom:8px;
+ }
+ .day-primary .day-summary{
+  font-size:.79rem!important;line-height:1.4;
+  margin:0 0 3px!important;
+ }
+ .day-primary .day-map{
+  display:flex;width:100%;
+  min-height:49px;margin:0;
+  font-size:.9rem;
+ }
+ /* A full list of route chips duplicates the timeline and makes the phone scroll longer. */
+ .day-primary .route-rail{display:none}
+ .timeline-title{
+  border-bottom:0;padding:6px 0;margin:0 0 3px;
+ }
+ .timeline-title h4{font-size:1.07rem}
+ .timeline-title p{display:none}
+ .day-filters{
+  display:grid;grid-template-columns:.74fr 1.16fr 1.05fr;
+  gap:5px;margin:3px 0 11px;padding:4px;border-radius:10px;
+ }
+ .day-filter-btn{min-height:48px;font-size:.83rem;padding:7px 4px;line-height:1.25}
+ .timeline{margin:0 0 10px}
+ .timeline::before{left:12px}
+ .stop{grid-template-columns:86px minmax(0,1fr);gap:10px;padding:0 0 10px}
+ .stop-time{
+  font-size:.79rem;line-height:1.25;
+  min-height:44px;padding:6px 4px;border-radius:9px;
+ }
+ .stop-detail{padding:2px 0 9px}
+ .stop-title{font-size:1.02rem;line-height:1.36;margin-bottom:4px;overflow-wrap:anywhere}
+ .stop-desc{font-size:.92rem;line-height:1.5;margin:0 0 6px}
+ .stop-tag{font-size:.74rem}
+ .stop-actions a,.stop-actions button{
+  min-height:48px;font-size:.83rem;
+  padding:7px 9px;
+ }
+ .day-tips{grid-template-columns:1fr;gap:8px}
+ .tip-box{padding:12px;font-size:.86rem}
+ .day-aside section{padding:12px;border-radius:12px}
+ .day-aside h4{font-size:1rem}
+ .route-map-stage{height:188px}
+ .route-map-place-list li{font-size:.78rem}
+ .route-map-link{font-size:.87rem;min-height:50px}
+ .day-spot-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .day-spot-photo figcaption strong{font-size:.87rem}
+ .day-spot-photo figcaption span{font-size:.77rem}
+ .day-spot-photo figcaption small{font-size:.68rem}
+ /* Controls and photos must never increase document width. */
+ .weather-one-line,.day-weather-row,.hotel-card,.day-card,
+ .day-aside,.day-primary,.day-content-grid,.stop-detail{
+  min-width:0;max-width:100%;
+ }
+ .weather-day{overflow:hidden}
+ .hotel-card .hotel-name{
+  font-size:clamp(.99rem,3.8vw,1.14rem);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ }
+ .hotel-card .hotel-name:focus-visible{outline-offset:1px}
+ .bottom-nav{
+  z-index:150;
+  background:rgba(255,255,255,.98);
+  border-top:1px solid #b9d6cd;
+  padding:5px 6px calc(5px + env(safe-area-inset-bottom));
+ }
+ .bottom-nav a{
+  min-height:57px;
+  font-size:.8rem;font-weight:850;line-height:1.3;
+ }
+ .bottom-nav a span{font-size:1.24rem}
+ .footer{padding-bottom:104px}
+}
+@media(max-width:385px){
+ .container{width:calc(100% - 16px)}
+ .today-panel{padding:12px}
+ .today-panel-heading{flex-wrap:wrap;gap:4px}
+ .today-actions{grid-template-columns:1fr 1fr;gap:6px}
+ .today-actions a{font-size:.78rem;padding:7px 6px}
+ .quick-card .quick-icon{display:none}
+ .quick-card strong{font-size:.83rem}
+ .quick-card small{font-size:.72rem}
+ .day-card .day-header{padding:12px 10px}
+ .day-body{padding:10px}
+ .day-mobile-strip{padding:8px 6px;gap:5px}
+ .mobile-route-jump{min-width:74px;font-size:.75rem;padding:6px}
+ .mobile-weather-snapshot .weather-place{font-size:.7rem!important}
+ .mobile-weather-snapshot .weather-reading{font-size:.73rem}
+ .mobile-weather-snapshot .weather-rain{font-size:.65rem}
+ .stop{grid-template-columns:77px minmax(0,1fr);gap:8px}
+ .stop-time{font-size:.74rem}
+ .stop-title{font-size:.96rem}
+ .stop-desc{font-size:.88rem}
+ .day-filter-btn{font-size:.78rem}
+}
+@media(max-width:770px) and (orientation:landscape) and (max-height:470px){
+ .utility-bar{position:static}
+ .days-jump{top:0}
+ .bottom-nav a{min-height:45px}
+ .bottom-nav a span{font-size:1.06rem}
+}
+@media(prefers-contrast:more){
+ .day-mobile-strip{border:2px solid #125b60}
+ .day-filter-btn[aria-pressed="true"]{border:2px solid #145d61}
+ .stop-desc{color:#183d49}
+}
+@media(forced-colors:active){
+ .day-filter-btn[aria-pressed="true"],.mobile-route-jump{
+  forced-color-adjust:auto;border:1px solid ButtonText;
+ }
+}
+@media print{
+ .day-mobile-strip,.day-filters{display:none}
+ .day-primary .route-rail{display:flex}
+ .day-aside .day-weather-panel,.day-aside .day-brief-panel{display:block}
+}
