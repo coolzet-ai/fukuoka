@@ -52,9 +52,17 @@ git push -u origin main
 - 일본 입국: https://www.vjw.digital.go.jp/
 - 일본 면세: https://www.nta.go.jp/publication/pamph/shohi/menzei/201805/pdf/caution_kr.pdf
 - 힐튼 대욕장: https://www.hilton.com/en/hotels/fukhihi-hilton-fukuoka-sea-hawk/spa/
-- 무나카타: https://mercure-fukuokamunakata-resortandspa.jp/ko/all_inclusive/
+- 무나카타: https://mercure-fukuokamunakata-resortandspa.jp/ko/
 - 규슈대학교: https://www.kyushu-u.ac.jp/en/university/facility/campus-visit/freewalk/
 - 라라포트: https://mitsui-shopping-park.com/ko/lalaport/fukuoka/access/parking.html
 - KB 카드: https://card.kbcard.com/BON/DVIEW/HBBMCXCRVNEC0001?eventNum=1002702&mainCC=a
 - 하나 Mastercard: https://m.hanacard.co.kr/MKEVT1010M.web?EVN_SEQ=60615
 - 날씨: https://open-meteo.com/
+
+
+## 2026.11.24 — 모바일 디자인 및 호텔 안내 개선
+- 글꼴: **Pretendard Variable** 우선, Noto Sans KR·시스템 글꼴 대체 사용. 폰트 파일을 저장소에 재배포하지 않습니다.
+- 기본 본문 19px, 큰 글씨 선택 23px, 명확한 버튼·시간표·고대비 상태 유지.
+- **실제 호텔 사진 2장씩**: 벳푸완(노천탕·객실 예시), 무나카타(외관·노천탕), 힐튼(외관·7층 대욕장). 공식 호텔 및 후쿠오카현 관광 사이트에 게시된 사진을 출처와 함께 원격으로 표시합니다. 사진은 예약한 정확한 객실과 다를 수 있습니다. 일부 이미지 제공처에서 외부 표시를 제한하면 대체 문구와 공식 갤러리 링크가 나옵니다.
+- 호텔 홈페이지 링크: 벳푸완 https://grand-mercure-beppubay-resortandspa.jp/ko/ / 무나카타 https://mercure-fukuokamunakata-resortandspa.jp/ko/ . 일부 환경에서 호텔 자체 사이트가 열리지 않으면 별도로 제공하는 **Accor 예약·공식 정보** 링크를 사용하세요.
+- 외부 사진은 GitHub 저장소에 복사해 넣지 않고 원 출처 서버에서 직접 표시합니다. 저장소를 공개할 때 가족 사진과 예약번호 등 개인정보는 올리지 마세요.
