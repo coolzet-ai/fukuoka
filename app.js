@@ -176,6 +176,56 @@ const HOTEL_MEDIA = {
 function hotelPhoto(url,alt,caption,photoClass) {
   return '<figure class="hotel-photo '+photoClass+'"><img src="'+url+'" alt="'+html(alt)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer"><figcaption>'+html(caption)+'</figcaption><span class="photo-fallback">사진을 불러올 수 없습니다. 아래 공식 사진 링크를 이용해 주세요.</span></figure>';
 }
+
+/* Today-first overview: Japan local date; does not change any booking or itinerary. */
+function japanLocalDate(){
+ const parts=new Intl.DateTimeFormat('en-US',{
+  timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'
+ }).formatToParts(new Date());
+ const p=Object.fromEntries(parts.filter(v=>v.type!=='literal').map(v=>[v.type,v.value]));
+ return p.year+'-'+p.month+'-'+p.day;
+}
+function updateJourneyDashboard(){
+ const title=$('todayTitle');
+ if(!title)return;
+ const date=japanLocalDate();
+ const dates=['2026-11-28','2026-11-29','2026-11-30','2026-12-01'];
+ let ix=dates.indexOf(date);
+ if(ix<0)ix=date<dates[0]?0:3;
+ const d=days[ix];
+ const before=date<dates[0],after=date>dates[3];
+ const labels=[
+  '그랜드 머큐어 벳푸완',
+  '머큐어 후쿠오카 무나카타',
+  '힐튼 후쿠오카 씨호크',
+  '후쿠오카공항 · KE792 귀국'
+ ];
+ const stayHints=[
+  '올인클루시브 · 저녁·조식·온천 포함',
+  '올인클루시브 · 저녁·조식·라운지 포함',
+  '트리플 객실 · 이와부로 대욕장 추가 이용',
+  '13:45 후쿠오카 출발 · 15:10 인천 도착'
+ ];
+ const stayBtn=$('todayStayLink');
+ $('todayDay').textContent=(before?'출발 전 · 첫째 날 미리보기':after?'여행 기록 확인':'일본 현지 오늘 일정')+' · DAY '+d.num;
+ title.textContent=d.where;
+ $('todayDescription').textContent=d.subtitle;
+ $('todayStay').textContent=labels[ix];
+ $('todayStayHint').textContent=stayHints[ix];
+ $('todayOpen').href='#'+d.id;
+ $('todayOpen').textContent='DAY '+d.num+' 상세 일정 바로 보기 →';
+ stayBtn.href=ix===3?'#flights':'#hotels';
+ stayBtn.textContent=ix===3?'귀국 항공편 확인 ↗':'숙소 상세 정보 확인 ↗';
+ const count=days.filter(x=>state.dayCompleted?.[x.id]).length;
+ const phase=before?'여행 준비 중':after?'여행 종료':'여행 중';
+ $('todayProgress').textContent=phase+' · '+count+'/4일 완료';
+ document.querySelectorAll('.days-jump a').forEach(a=>{
+   if(a.getAttribute('href')==='#'+d.id){
+     a.setAttribute('aria-current','date');
+   }else a.removeAttribute('aria-current');
+ });
+}
+
 function renderHotels(){
  $('hotelGrid').innerHTML=hotels.map((h,i)=>{
    const m=HOTEL_MEDIA[h.id];
@@ -473,6 +523,7 @@ function setupEvents(){
     save();renderDays();
     const control=document.querySelector('#'+id+' .day-collapse-toggle');
     control?.focus({preventScroll:true});
+    updateJourneyDashboard();
     notify(state.dayCompleted[id]?'이날 여행을 완료하고 접었습니다.':'여행 완료 표시를 취소했습니다.');
     return;
   }
@@ -520,5 +571,5 @@ function blobToDataURL(blob){return new Promise((resolve,reject)=>{const r=new F
 function dataURLToBlob(dataURL){const [h,data]=dataURL.split(',');const mime=(h.match(/data:(.*?);base64/)||[])[1]||'image/jpeg';const bytes=atob(data),a=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)a[i]=bytes.charCodeAt(i);return new Blob([a],{type:mime});}
 async function backupAll(){try{$('photoStatus').textContent='백업 파일을 준비 중입니다…';const photos=await dbAll();const out=[];for(const x of photos)out.push({...x,blob:await blobToDataURL(x.blob)});const payload={version:1,exported:new Date().toISOString(),state,photos:out};downloadFile('kyushu-family-backup-'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(payload)],{type:'application/json'}));$('photoStatus').textContent='백업 파일 저장이 시작되었습니다. 이 파일을 안전한 곳에 보관하세요.';}catch(err){$('photoStatus').textContent='백업을 만들지 못했습니다: '+err.message;}}
 async function importAll(e){const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(data.version!==1||!data.state||!Array.isArray(data.photos))throw Error('지원하지 않는 백업 파일');if(!confirm('백업 파일의 내용으로 준비물·지출 기록을 바꾸고 사진을 추가할까요?'))return;for(const p of data.photos){if(typeof p.blob!=='string'||!p.blob.startsWith('data:image/'))continue;await dbPut({...p,blob:dataURLToBlob(p.blob)});}state={...data.state,checks:data.state.checks||{},stops:data.state.stops||{},fixed:data.state.fixed||{},variable:data.state.variable||{},expenses:data.state.expenses||[]};save();location.reload();}catch(err){notify('백업 복원 실패: '+err.message)}finally{e.target.value='';}}
-function init(){if(state.large){document.body.classList.add('large-text');$('fontSizeBtn').setAttribute('aria-pressed','true');}if(state.contrast){document.body.classList.add('high-contrast');$('contrastBtn').setAttribute('aria-pressed','true');}setupCountdown();renderHotels();renderDays();renderPromo();renderChecks();renderCosts();renderExpenses();renderSources();setupEvents();renderWeather(weatherPlaces,false);loadWeather();loadGallery();if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+function init(){if(state.large){document.body.classList.add('large-text');$('fontSizeBtn').setAttribute('aria-pressed','true');}if(state.contrast){document.body.classList.add('high-contrast');$('contrastBtn').setAttribute('aria-pressed','true');}setupCountdown();renderHotels();renderDays();updateJourneyDashboard();renderPromo();renderChecks();renderCosts();renderExpenses();renderSources();setupEvents();renderWeather(weatherPlaces,false);loadWeather();loadGallery();if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
