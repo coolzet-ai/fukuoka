@@ -278,7 +278,128 @@ function dayStopRow(d,s,i){
   +'<button type="button" class="stop-toggle" data-key="'+d.id+'-'+i+'" aria-pressed="'+done+'">'+(done?'✓ 완료됨':'□ 완료 표시')+'</button>'
   +'</div></div></li>';
 }
+
+/* Compact geo overview. Coordinates approximate map anchors, not road routing.
+ * OpenStreetMap via Leaflet (no API key); offline gracefully falls back to a schematic.
+ */
+const DAY_ROUTE_MAPS={
+ day1:[
+  ['후쿠오카공항',33.585,130.451],['야마다 SA',33.430,130.730],
+  ['벳푸만 SA',33.339,131.478],['우미지옥',33.317,131.468],
+  ['마트',33.339,131.493],['벳푸완 호텔',33.35603,131.49832]
+ ],
+ day2:[
+  ['벳푸완 호텔',33.35603,131.49832],['긴린코',33.265,131.369],
+  ['유후인 점심·마트',33.265,131.359],['무나카타 특산품점',33.852,130.539],
+  ['무나카타 호텔',33.860,130.520]
+ ],
+ day3:[
+  ['무나카타 호텔',33.860,130.520],['규슈대 이토캠퍼스',33.595,130.224],
+  ['라라포트',33.570,130.445],['하카타 마잉',33.590,130.420],
+  ['MARK IS 마트',33.592,130.358],['힐튼 씨호크',33.595,130.355]
+ ],
+ day4:[
+  ['힐튼 씨호크',33.595,130.355],['후쿠오카공항 국제선',33.585,130.452]
+ ]
+};
+let leafletPromise=null;
+let instantiatedRouteMaps=[];
+function loadLeaflet(){
+ if(window.L)return Promise.resolve(window.L);
+ if(leafletPromise)return leafletPromise;
+ leafletPromise=new Promise((resolve,reject)=>{
+  if(!document.querySelector('link[data-leaflet]')){
+   const css=document.createElement('link');css.rel='stylesheet';css.dataset.leaflet='1';
+   css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+   css.crossOrigin='anonymous';document.head.appendChild(css);
+  }
+  const script=document.createElement('script');
+  script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  script.crossOrigin='anonymous';script.async=true;
+  script.onload=()=>window.L?resolve(window.L):reject(new Error('Leaflet unavailable'));
+  script.onerror=()=>reject(new Error('Map tiles unavailable'));
+  document.head.appendChild(script);
+ }).catch(()=>null);
+ return leafletPromise;
+}
+function routeMapFallback(dayId){
+ const points=DAY_ROUTE_MAPS[dayId]||[];
+ const n=points.length;
+ const spots=points.map((p,i)=>{
+  const x=25+(i%3)*144+(Math.floor(i/3)%2)*6, y=48+Math.floor(i/3)*97;
+  return {name:p[0],i,x:Math.min(x,339),y:Math.min(y,170)};
+ });
+ const path=spots.map((p,i)=>(i?'L':'M')+p.x+' '+p.y).join(' ');
+ return '<svg class="route-map-fallback" viewBox="0 0 360 204" role="img" aria-label="'+html(points.map(p=>p[0]).join(' → '))+'">'
+ +'<defs><linearGradient id="mapBg-'+dayId+'" x2="0" y2="1"><stop stop-color="#e6f0e9"/><stop offset="1" stop-color="#f5f6ed"/></linearGradient></defs>'
+ +'<rect width="360" height="204" rx="14" fill="url(#mapBg-'+dayId+')"/>'
+ +'<path d="M10 140 Q 95 65 164 130 T355 78" fill="none" stroke="#c7dccc" stroke-width="23" opacity=".9"/>'
+ +'<path d="M-5 23 Q90 95 165 26 T365 160" fill="none" stroke="#fff" stroke-width="6" opacity=".8"/>'
+ +'<path d="'+path+'" fill="none" stroke="#176e70" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 5"/>'
+ +spots.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="14" fill="#155a65" stroke="#fff" stroke-width="3"/><text x="'+p.x+'" y="'+(p.y+5)+'" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">'+(p.i+1)+'</text>').join('')
+ +'<text x="12" y="195" font-size="10" fill="#496c65">개략 동선 · 도로 지도는 아래 길찾기 이용</text></svg>';
+}
+function routeMapPanel(d){
+ const places=DAY_ROUTE_MAPS[d.id]||[];
+ return '<section class="day-route-panel" aria-label="'+html(d.date)+' 이동 동선지도">'
+  +'<h4>🗺️ 오늘의 동선지도</h4>'
+  +'<div class="route-map-stage" id="route-map-'+d.id+'" data-route-map="'+d.id+'">'+routeMapFallback(d.id)+'</div>'
+  +'<ol class="route-map-place-list" aria-label="주요 방문 순서">'
+  +places.map((p,i)=>'<li><span class="route-map-index">'+(i+1)+'</span>'+html(p[0])+'</li>').join('')
+  +'</ol>'
+  +'<a class="route-map-link" href="'+routeUrl(d)+'" target="_blank" rel="noopener noreferrer">🚗 실제 차량 길찾기 열기 ↗</a>'
+  +'<p class="route-map-caveat">지도 핀·직선 연결은 개략 위치입니다. 실제 도로·교통·렌터카 반납점은 길찾기에서 확인하세요.</p>'
+  +'</section>';
+}
+function clearRouteMaps(){
+ instantiatedRouteMaps.forEach(m=>{try{m.remove()}catch{}});
+ instantiatedRouteMaps=[];
+}
+async function initializeRouteMaps(){
+ // A useful offline schematic is already visible. Leaflet upgrades it only when available.
+ if(!document.querySelectorAll)return;
+ const shells=[...document.querySelectorAll('.route-map-stage')].filter(el=>el.offsetParent!==null);
+ if(!shells.length)return;
+ const Leaflet=await loadLeaflet();
+ if(!Leaflet)return;
+ for(const shell of shells){
+  if(!shell.isConnected||shell.offsetParent===null||shell.dataset.initialized)continue;
+  const places=DAY_ROUTE_MAPS[shell.dataset.routeMap]||[];
+  if(!places.length)continue;
+  try{
+   shell.innerHTML='';
+   const m=Leaflet.map(shell,{zoomControl:false,attributionControl:true,
+     dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,
+     boxZoom:false,keyboard:false,trackResize:true});
+   instantiatedRouteMaps.push(m);
+   Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+     attribution:'© OpenStreetMap contributors',maxZoom:18,
+     detectRetina:false
+   }).addTo(m);
+   const pts=places.map(p=>[p[1],p[2]]);
+   Leaflet.polyline(pts,{color:'#166a70',weight:4,opacity:.84,dashArray:'7 6'}).addTo(m);
+   places.forEach((p,i)=>{
+     const marker=Leaflet.divIcon({
+       className:'route-pin-wrapper',
+       html:'<span class="route-pin">'+(i+1)+'</span>',
+       iconSize:[30,30],iconAnchor:[15,15]
+     });
+     Leaflet.marker([p[1],p[2]],{icon:marker,keyboard:false})
+       .bindTooltip((i+1)+'. '+p[0],{direction:'top'}).addTo(m);
+   });
+   const bounds=Leaflet.latLngBounds(pts);
+   m.fitBounds(bounds.pad(.24),{padding:[20,20],maxZoom:12,animate:false});
+   if(places.length===2)m.setZoom(Math.min(m.getZoom(),11));
+   shell.dataset.initialized='1';
+   requestAnimationFrame(()=>{if(shell.isConnected&&shell.offsetParent!==null)m.invalidateSize(false);});
+  }catch{
+   shell.innerHTML=routeMapFallback(shell.dataset.routeMap);
+  }
+ }
+}
+
 function renderDays(){
+ clearRouteMaps();
  $('daySections').innerHTML=days.map(d=>{
   const completed=!!state.dayCompleted[d.id],collapsed=!!state.dayCollapsed[d.id];
   const panelId='day-panel-'+d.id;
@@ -301,6 +422,7 @@ function renderDays(){
    +'</div><aside class="day-aside" aria-label="'+html(d.date)+'의 날씨와 주요 장소">'
    +'<section class="day-weather-panel"><h4>🌤️ 해당 날짜 예상 날씨</h4><div data-day-weather="'+d.id+'">'+dayWeatherMarkup(d.id)+'</div>'
    +'<p>현지 예보 · 출발 전 날씨 새로고침</p></section>'
+   +routeMapPanel(d)
    +'<section class="day-spot-panel"><h4>📷 주요 스팟 사진</h4>'+spotPhotos(d.id)+'</section>'
    +'<section class="day-brief-panel"><h4>한눈에 보는 오늘</h4>'+dayHighlights(d)+'</section>'
    +'</aside></div></div></article>';
@@ -308,6 +430,7 @@ function renderDays(){
  document.querySelectorAll('.day-spot-photo img').forEach(img=>{
   img.addEventListener('error',()=>{const parent=img.closest('.day-spot-photo');if(parent)parent.classList.add('photo-error');});
  });
+ initializeRouteMaps();
 }
 
 function renderPromo(){$('promoGrid').innerHTML=promos.map(p=>`<article class="card promo-card"><div class="promo-title">${html(p.name)}</div><div class="promo-dates">${html(p.duration)}</div><p><strong>${html(p.lead)}</strong></p><p>${html(p.detail)}</p><span class="pill muted">${html(p.tag)}</span><p style="margin-top:15px"><a class="small-link" target="_blank" rel="noopener noreferrer" href="${html(p.url)}">공식 상세 안내 ↗</a></p></article>`).join('');$('souvenirGrid').innerHTML=souvenirs.map(a=>`<div class="souvenir"><strong>📦 ${html(a[0])}</strong>${html(a[1])}</div>`).join('');}
