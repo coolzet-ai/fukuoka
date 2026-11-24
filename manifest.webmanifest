@@ -1,1 +1,18 @@
-{"name":"부모님과 함께하는 규슈 3박 4일","short_name":"규슈 효도여행","description":"70대 부모님을 위한 큰 글씨 여행 안내서","lang":"ko","start_url":"./index.html","display":"standalone","background_color":"#f6f5f0","theme_color":"#12314c","icons":[{"src":"./assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{
+  "name": "부모님과 함께하는 규슈 3박 4일",
+  "short_name": "규슈 효도여행",
+  "description": "70대 부모님을 위한 큰 글씨 규슈 여행 일정·길찾기·날씨·경비 웹앱",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f7f5",
+  "theme_color": "#0e303c",
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
