@@ -324,3 +324,32 @@
  .day-primary .route-rail{display:flex}
  .day-aside .day-weather-panel,.day-aside .day-brief-panel{display:block}
 }
+
+
+
+/* Final mobile reading order and transparent activity-filter feedback. */
+.day-filter-hint{
+ margin:-9px 0 12px;
+ color:#496570;
+ font-size:.77rem;line-height:1.48;
+}
+@media(max-width:770px){
+ .day-primary{display:flex;flex-direction:column}
+ .day-mobile-strip{order:0}
+ .day-primary .day-top{order:1}
+ .day-primary .route-rail{order:2}
+ .timeline-title{order:3}
+ .day-filters{order:4}
+ .day-filter-hint{order:5;margin:-7px 0 9px;font-size:.81rem}
+ .timeline{order:6}
+ .day-tips{order:7}
+ #daySections .day-filter-btn{
+   -webkit-tap-highlight-color:transparent;
+   touch-action:manipulation;
+ }
+ #daySections .day-filter-btn:active{transform:scale(.985)}
+ .day-route-panel{scroll-margin-top:118px}
+}
+@media(prefers-reduced-motion:reduce){
+ #daySections .day-filter-btn:active{transform:none}
+}
