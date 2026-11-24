@@ -318,7 +318,7 @@ function spotPhotos(id){
 }
 function dayStopRow(d,s,i){
  const done=!!state.stops[d.id+'-'+i];
- const type=isMealStop(s)?'meal-stop':isSightStop(s)?'sight-stop':'transit-stop';
+ const type=[isMealStop(s)?'meal-stop':'',isSightStop(s)?'sight-stop':''].filter(Boolean).join(' ')||'transit-stop';
  return '<li class="stop '+type+(done?' done':'')+'" data-stop="'+d.id+'-'+i+'">'
   +'<div class="stop-time">'+html(s[0])+'</div><div class="stop-detail"><div class="stop-title">'+html(s[1])+'</div>'
   +'<p class="stop-desc">'+html(s[2])+'</p><div class="stop-tags"><span class="stop-tag">'+html(s[3])+'</span>'
@@ -468,7 +468,8 @@ function renderDays(){
    +'<div class="route-rail" aria-label="이동 순서">'+d.route.map(x=>'<span class="route-chip">'+html(x)+'</span>').join('')+'</div>'
    +'<div class="timeline-title"><h4>시간순 전체 일정</h4><p><span class="type-key sight-key">관광·쇼핑</span><span class="type-key meal-key">식사·카페</span></p></div>'
    +'<div class="day-filters" role="group" aria-label="'+html(d.date)+' 일정 종류 선택">'
-   +[['all','전체'],['sight','관광·쇼핑'],['meal','식사·카페']].map(([value,label])=>'<button class="day-filter-btn" type="button" data-day-filter="'+d.id+'" data-filter-value="'+value+'" aria-pressed="'+((state.dayFilters[d.id]||'all')===value)+'">'+label+'</button>').join('')+'</div>'
+   +[['all','전체 일정'],['sight','관광·쇼핑'],['meal','식사·카페']].map(([value,label])=>'<button class="day-filter-btn" type="button" data-day-filter="'+d.id+'" data-filter-value="'+value+'" aria-pressed="'+((state.dayFilters[d.id]||'all')===value)+'">'+label+'</button>').join('')+'</div>'
+   +'<p class="day-filter-hint" aria-live="polite">'+((state.dayFilters[d.id]||'all')==='all'?'전체 시간표를 표시하고 있습니다.':'선택한 일정만 표시 중입니다. ‘전체 일정’을 누르면 모두 보입니다.')+'</p>'
    +'<ol class="timeline">'+d.stops.map((s,i)=>dayStopRow(d,s,i)).join('')+'</ol>'
    +'<div class="day-tips"><div class="tip-box"><strong>💡 꼭 기억할 팁</strong>'+html(d.tip)+'</div>'
    +'<div class="tip-box warning"><strong>☔ 비·피로 시 B안</strong>'+html(d.alt)+'</div></div>'
@@ -550,6 +551,8 @@ function setupEvents(){
       card.querySelectorAll('button.day-filter-btn').forEach(btn=>{
         btn.setAttribute('aria-pressed',String(btn.dataset.filterValue===value));
       });
+      const hint=card.querySelector('.day-filter-hint');
+      if(hint)hint.textContent=value==='all'?'전체 시간표를 표시하고 있습니다.':'선택한 일정만 표시 중입니다. ‘전체 일정’을 누르면 모두 보입니다.';
     }
     return;
   }
