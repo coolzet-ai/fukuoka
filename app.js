@@ -122,7 +122,7 @@ function maps(q){return 'https://www.google.com/maps/search/?api=1&query='+encod
 function routeUrl(d){return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+encodeURIComponent(d.routeStart)+'&destination='+encodeURIComponent(d.routeEnd)+'&waypoints='+encodeURIComponent(d.routeWay.join('|'));}
 let state;
 try{state=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{state={};}
-state.checks=state.checks||{};state.stops=state.stops||{};state.fixed=state.fixed||{};state.variable=state.variable||{};state.expenses=state.expenses||[];
+state.checks=state.checks||{};state.stops=state.stops||{};state.dayCompleted=state.dayCompleted||{};state.dayCollapsed=state.dayCollapsed||{};state.fixed=state.fixed||{};state.variable=state.variable||{};state.expenses=state.expenses||[];
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state));}catch{notify('저장공간 부족: 백업을 권장합니다.');}}
 function notify(msg){const n=$('toast');n.textContent=msg;n.classList.add('show');clearTimeout(notify.timer);notify.timer=setTimeout(()=>n.classList.remove('show'),2600);}
 
@@ -202,7 +202,114 @@ function renderHotels(){
  });
 }
 
-function renderDays(){$('daySections').innerHTML=days.map(d=>`<article class="card day-card" id="${d.id}"><header class="day-header"><div><div class="day-kicker">DAY ${d.num} · ${d.date}</div><h3>${html(d.where)}</h3><p>${html(d.subtitle)}</p></div><div class="day-date"><b>${d.num}</b>일차</div></header><div class="day-body"><div class="day-top"><p class="day-summary">🚙 모든 이동시간은 교통·주차·부모님 휴식에 따라 달라지는 <strong>계획용 예상시간</strong>입니다.</p><a class="day-map" target="_blank" rel="noopener noreferrer" href="${routeUrl(d)}">🧭 오늘 차량 길찾기 ↗</a></div><div class="route-rail" aria-label="이동 순서">${d.route.map(x=>`<span class="route-chip">${html(x)}</span>`).join('')}</div><ol class="timeline">${d.stops.map((s,i)=>{const done=!!state.stops[d.id+'-'+i];return `<li class="stop${done?' done':''}" data-stop="${d.id}-${i}"><div class="stop-time">${html(s[0])}</div><div class="stop-detail"><div class="stop-title">${html(s[1])}</div><p class="stop-desc">${html(s[2])}</p><div class="stop-tags"><span class="stop-tag">${html(s[3])}</span>${s[5]?'<span class="stop-tag important">중요</span>':''}${s[6]?'<span class="stop-tag">선택 일정</span>':''}</div><div class="stop-actions">${s[4]?`<a target="_blank" rel="noopener noreferrer" href="${maps(s[4])}" aria-label="${html(s[1])} 지도에서 보기">📍 길찾기 ↗</a>`:''}<button type="button" class="stop-toggle" data-key="${d.id}-${i}" aria-pressed="${done}">${done?'✓ 완료됨':'□ 완료 표시'}</button></div></div></li>`;}).join('')}</ol><div class="day-tips"><div class="tip-box"><strong>💡 꼭 기억할 팁</strong>${html(d.tip)}</div><div class="tip-box warning"><strong>☔ 비·피로 시 B안</strong>${html(d.alt)}</div></div></div></article>`).join('');}
+
+/* Day-by-day tourism brochure media; remote images belong to credited source sites. */
+const DAY_SPOT_MEDIA={
+ day1:[
+  {src:'https://cdn-ak.f.st-hatena.com/images/fotolife/t/tboffice/20250507/20250507092337.jpg',title:'우미지옥',detail:'푸른 온천 연못·기념품점, 짧게 관광',credit:'사진: 飛行機搭乗奇行',link:'https://tboffice.hateblo.jp/entry/beppu-umijigoku'},
+  {src:HOTEL_MEDIA.grand.main,title:'그랜드 머큐어 벳푸완',detail:'체크인 후 라운지·저녁·온천 휴식',credit:'사진: 그랜드 머큐어 공식',link:HOTEL_MEDIA.grand.official}
+ ],
+ day2:[
+  {src:'https://oita-tourism.com/lsc/upfile/spot/0000/1066/1066_9_l.jpg',title:'유후인 긴린코',detail:'호수 주변 20~30분 산책과 지역 선물',credit:'사진: 오이타현 공식 관광사이트',link:'https://oita-tourism.com/en/attractions/detail_1066.html'},
+  {src:HOTEL_MEDIA.munakata.main,title:'머큐어 무나카타',detail:'지역 특산품 쇼핑 후 올인클루시브 숙박',credit:'사진: 후쿠오카현 공식 관광사이트',link:HOTEL_MEDIA.munakata.official}
+ ],
+ day3:[
+  {src:'https://showcase.city.fukuoka.lg.jp/admn/mrgt/images/2014/10/img0986-1280x852.jpg',title:'규슈대학교 이토캠퍼스',detail:'중앙광장과 건물 외관만 짧게 방문',credit:'사진: 후쿠오카시 공식 사진자료',link:'https://showcase.city.fukuoka.lg.jp/photo/img0986.html'},
+  {src:'https://gofukuoka.jp/files/Spots/40a6137d-2517-425e-ba6b-36dd5a2c2a08/image/ab32fedeecc49a94b5bacb9199e9396b.jpg',title:'라라포트 후쿠오카',detail:'점심·대형 쇼핑몰·건담 굿즈 쇼핑',credit:'사진: 후쿠오카시 공식 관광사이트',link:'https://gofukuoka.jp/ko/spots/detail/259810'}
+ ],
+ day4:[
+  {src:HOTEL_MEDIA.hilton.main,title:'힐튼 후쿠오카 씨호크',detail:'조식·체크아웃 후 공항으로 이동',credit:'사진: 힐튼 공식',link:HOTEL_MEDIA.hilton.official},
+  {src:'https://resources.matcha-jp.com/resize/720x2000/2023/03/16-136047.webp',title:'후쿠오카공항 국제선',detail:'렌터카 반납·세관 확인·KE792 귀국',credit:'사진: 일본 관광 매체 MATCHA',link:'https://matcha-jp.com/ko/11776'}
+ ]
+};
+const DAY_FORECAST_DATES={
+ day1:['2026-11-28'],day2:['2026-11-29'],
+ day3:['2026-11-30'],day4:['2026-12-01']
+};
+let dayWeatherSnapshot=null;
+state.dayCompleted=state.dayCompleted||{};
+state.dayCollapsed=state.dayCollapsed||{};
+function isMealStop(stop){return /점심|저녁|조식|식사/.test(stop[3]);}
+function isSightStop(stop){return /관광|기념품|마트|쇼핑|선택|온천/.test(stop[3]);}
+function dayWeatherData(id){
+ const entries=dayWeatherSnapshot||weatherPlaces;
+ return entries.filter(p=>(DAY_FORECAST_DATES[id]||[]).includes(p.date));
+}
+function oneLineWeather(place){
+ const d=place.data||place.backup;
+ const icon=place.data?weatherCondition(place.code)[0]:(d[2]>40?'🌦️':'🌤️');
+ return '<span class="weather-one-line"><strong class="weather-place">'+html(place.label)+' · '+html(place.name)+'</strong>'
+   +'<span class="weather-reading"><span aria-hidden="true">'+icon+'</span> '+Math.round(d[0])+'°/'+Math.round(d[1])+'°</span>'
+   +'<span class="weather-rain">비 '+Math.round(d[2]??0)+'%</span></span>';
+}
+function dayWeatherMarkup(id){
+ const rows=dayWeatherData(id);
+ return rows.length?rows.map(p=>'<div class="day-weather-row">'+oneLineWeather(p)+'</div>').join(''):
+ '<p class="day-weather-empty">날씨를 불러오지 못했습니다. 상단 날씨에서 새로고침해 주세요.</p>';
+}
+function dayHighlights(d){
+ const sights=d.stops.filter(isSightStop);
+ const meals=d.stops.filter(isMealStop);
+ const list=(arr,max,empty)=>arr.length?
+  '<ul>'+arr.slice(0,max).map(s=>'<li><span class="brief-time">'+html(s[0])+'</span><span>'+html(s[1])+'</span></li>').join('')+'</ul>':
+  '<p class="brief-empty">'+empty+'</p>';
+ return '<div class="day-highlight-grid">'
+  +'<section class="day-highlight sight" aria-label="관광과 쇼핑"><h5>📍 관광·쇼핑</h5>'+list(sights,5,'귀국일에는 별도의 관광을 넣지 않았습니다.')+'</section>'
+  +'<section class="day-highlight meal" aria-label="식사와 카페"><h5>🍽️ 식사·카페</h5>'+list(meals,4,'별도 식사 일정 없이 이동과 수속에 집중합니다.')+'</section>'
+  +'</div>';
+}
+function spotPhotos(id){
+ return (DAY_SPOT_MEDIA[id]||[]).map(m=>'<figure class="day-spot-photo">'
+  +'<a href="'+m.link+'" target="_blank" rel="noopener noreferrer" aria-label="'+html(m.title)+' 사진 출처 열기">'
+  +'<img src="'+m.src+'" alt="'+html(m.title)+' 풍경 사진" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
+  +'<span class="day-spot-fallback">사진을 불러오지 못했습니다. 사진 출처 보기 ↗</span></a>'
+  +'<figcaption><strong>'+html(m.title)+'</strong><span>'+html(m.detail)+'</span>'
+  +'<small>'+html(m.credit)+'</small></figcaption></figure>').join('');
+}
+function dayStopRow(d,s,i){
+ const done=!!state.stops[d.id+'-'+i];
+ const type=isMealStop(s)?'meal-stop':isSightStop(s)?'sight-stop':'transit-stop';
+ return '<li class="stop '+type+(done?' done':'')+'" data-stop="'+d.id+'-'+i+'">'
+  +'<div class="stop-time">'+html(s[0])+'</div><div class="stop-detail"><div class="stop-title">'+html(s[1])+'</div>'
+  +'<p class="stop-desc">'+html(s[2])+'</p><div class="stop-tags"><span class="stop-tag">'+html(s[3])+'</span>'
+  +(s[5]?'<span class="stop-tag important">중요</span>':'')+(s[6]?'<span class="stop-tag">선택 일정</span>':'')+'</div>'
+  +'<div class="stop-actions">'
+  +(s[4]?'<a target="_blank" rel="noopener noreferrer" href="'+maps(s[4])+'" aria-label="'+html(s[1])+' 지도에서 보기">📍 길찾기 ↗</a>':'')
+  +'<button type="button" class="stop-toggle" data-key="'+d.id+'-'+i+'" aria-pressed="'+done+'">'+(done?'✓ 완료됨':'□ 완료 표시')+'</button>'
+  +'</div></div></li>';
+}
+function renderDays(){
+ $('daySections').innerHTML=days.map(d=>{
+  const completed=!!state.dayCompleted[d.id],collapsed=!!state.dayCollapsed[d.id];
+  const panelId='day-panel-'+d.id;
+  return '<article class="card day-card'+(completed?' is-complete':'')+'" id="'+d.id+'">'
+   +'<header class="day-header"><div class="day-heading"><div class="day-kicker">DAY '+d.num+' · '+html(d.date)+'</div>'
+   +'<h3>'+html(d.where)+'</h3><p>'+html(d.subtitle)+'</p></div>'
+   +'<div class="day-header-actions"><span class="day-status'+(completed?' complete':'')+'">'+(completed?'✓ 여행 완료':'진행 예정')+'</span>'
+   +'<button type="button" class="day-complete-toggle" data-day-id="'+d.id+'" aria-pressed="'+completed+'" aria-label="'+html(d.date)+' 여행 완료 표시'+(completed?' 취소':'')+'">'+(completed?'완료 취소':'✓ 이날 여행 완료')+'</button>'
+   +'<button type="button" class="day-collapse-toggle" data-day-id="'+d.id+'" aria-expanded="'+(!collapsed)+'" aria-controls="'+panelId+'">'+(collapsed?'＋ 일정 다시 펼치기':'− 일정 접기')+'</button>'
+   +'</div></header>'
+   +'<div id="'+panelId+'" class="day-body"'+(collapsed?' hidden':'')+'>'
+   +'<div class="day-content-grid"><div class="day-primary">'
+   +'<div class="day-top"><p class="day-summary">🚙 이동시간은 교통·주차·부모님 휴식에 따라 달라지는 <strong>예상 시간</strong>입니다.</p>'
+   +'<a class="day-map" target="_blank" rel="noopener noreferrer" href="'+routeUrl(d)+'">🧭 오늘 차량 길찾기 ↗</a></div>'
+   +'<div class="route-rail" aria-label="이동 순서">'+d.route.map(x=>'<span class="route-chip">'+html(x)+'</span>').join('')+'</div>'
+   +'<div class="timeline-title"><h4>시간순 전체 일정</h4><p><span class="type-key sight-key">관광·쇼핑</span><span class="type-key meal-key">식사·카페</span>로 구분했습니다.</p></div>'
+   +'<ol class="timeline">'+d.stops.map((s,i)=>dayStopRow(d,s,i)).join('')+'</ol>'
+   +'<div class="day-tips"><div class="tip-box"><strong>💡 꼭 기억할 팁</strong>'+html(d.tip)+'</div>'
+   +'<div class="tip-box warning"><strong>☔ 비·피로 시 B안</strong>'+html(d.alt)+'</div></div>'
+   +'</div><aside class="day-aside" aria-label="'+html(d.date)+'의 날씨와 주요 장소">'
+   +'<section class="day-weather-panel"><h4>🌤️ 해당 날짜 예상 날씨</h4><div data-day-weather="'+d.id+'">'+dayWeatherMarkup(d.id)+'</div>'
+   +'<p>현지 예보 · 출발 전 날씨 새로고침</p></section>'
+   +'<section class="day-spot-panel"><h4>📷 주요 스팟 사진</h4>'+spotPhotos(d.id)+'</section>'
+   +'<section class="day-brief-panel"><h4>한눈에 보는 오늘</h4>'+dayHighlights(d)+'</section>'
+   +'</aside></div></div></article>';
+ }).join('');
+ document.querySelectorAll('.day-spot-photo img').forEach(img=>{
+  img.addEventListener('error',()=>{const parent=img.closest('.day-spot-photo');if(parent)parent.classList.add('photo-error');});
+ });
+}
+
 function renderPromo(){$('promoGrid').innerHTML=promos.map(p=>`<article class="card promo-card"><div class="promo-title">${html(p.name)}</div><div class="promo-dates">${html(p.duration)}</div><p><strong>${html(p.lead)}</strong></p><p>${html(p.detail)}</p><span class="pill muted">${html(p.tag)}</span><p style="margin-top:15px"><a class="small-link" target="_blank" rel="noopener noreferrer" href="${html(p.url)}">공식 상세 안내 ↗</a></p></article>`).join('');$('souvenirGrid').innerHTML=souvenirs.map(a=>`<div class="souvenir"><strong>📦 ${html(a[0])}</strong>${html(a[1])}</div>`).join('');}
 function renderChecks(){let count=0,total=0;$('checklistGrid').innerHTML=Object.entries(checks).map(([group,arr])=>{const n=arr.filter((_,i)=>state.checks[group+'-'+i]).length;count+=n;total+=arr.length;return `<section class="card check-group"><h3>${html(group)}</h3><p class="check-progress">${n} / ${arr.length}개 완료</p>${arr.map((item,i)=>{let key=group+'-'+i;let done=!!state.checks[key];return `<label class="check-row${done?' done':''}"><input type="checkbox" data-check="${html(key)}" ${done?'checked':''}><span>${html(item)}</span></label>`;}).join('')}</section>`}).join('');$('checklist').querySelector('.section-head p:last-child').textContent=`${total}개 중 ${count}개 준비했습니다. 체크 내용은 기기에 자동 저장됩니다.`;}
 function getRate(){const r=Number($('fxRate').value);return Number.isFinite(r)&&r>0?r:DEFAULT_RATE;}
@@ -220,13 +327,48 @@ const weatherPlaces=[
  {name:'후쿠오카',date:'2026-12-01',label:'12/1 화',lat:33.590,lon:130.401,backup:[21,12,1,'약간 흐림']}
 ];
 function weatherCondition(code){if(code===0)return ['☀️','맑음'];if(code<=3)return ['🌤️','구름 조금'];if(code<=48)return ['🌫️','안개'];if(code<=67)return ['🌦️','비 가능'];if(code<=77)return ['🌨️','눈'];if(code<=82)return ['🌧️','비'];if(code<=86)return ['🌨️','눈'];return ['⛈️','소나기/천둥'];}
-function renderWeather(items,live){$('weatherGrid').innerHTML=items.map(x=>{let d=x.data||x.backup;let icon=x.data?weatherCondition(x.code)[0]:(d[2]>40?'🌦️':'🌤️');let desc=x.data?weatherCondition(x.code)[1]:d[3];return `<article class="weather-day"><strong>${html(x.label)} · ${html(x.name)}</strong><div class="weather-big"><span aria-hidden="true">${icon}</span><b>${Math.round(d[0])}° / ${Math.round(d[1])}°</b></div><p>${html(desc)} · 강수확률 ${Math.round(d[2]??0)}%</p></article>`}).join('');$('weatherMeta').textContent=live?'Open-Meteo 실시간 예보 갱신 완료 · 일본 현지시간 '+new Date().toLocaleString('ko-KR',{timeZone:'Asia/Tokyo'})+' · 날씨는 변동 가능':'2026년 11월 24일 확인 예보를 임시 표시하고 있습니다. 최신 갱신 실패 또는 오프라인 상태. 출발 전 새로고침하세요.';}
+
+function renderWeather(items,live){
+ dayWeatherSnapshot=items;
+ $('weatherGrid').innerHTML=items.map(x=>'<article class="weather-day" aria-label="'+html(x.label)+' '+html(x.name)+' 날씨">'+oneLineWeather(x)+'</article>').join('');
+ document.querySelectorAll('[data-day-weather]').forEach(el=>{el.innerHTML=dayWeatherMarkup(el.dataset.dayWeather);});
+ $('weatherMeta').textContent=live?
+  'Open-Meteo 예보 갱신 · 일본 현지시간 '+new Date().toLocaleString('ko-KR',{timeZone:'Asia/Tokyo'})+' · 변동 가능':
+  '2026년 11월 24일 확인한 예보를 임시 표시합니다. 온라인에서 새로고침해 주세요.';
+}
 async function loadWeather(){const b=$('refreshWeather');b.disabled=true;b.textContent='날씨 확인 중…';let received=0;const outcomes=await Promise.all(weatherPlaces.map(async p=>{try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${p.date}&end_date=${p.date}`;let c=new AbortController();const t=setTimeout(()=>c.abort(),10000);let response=await fetch(url,{signal:c.signal});clearTimeout(t);if(!response.ok)throw Error('weather');const j=await response.json();const a=j.daily;if(!a?.temperature_2m_max?.length)throw Error('data');received++;return {...p,code:a.weather_code[0],data:[a.temperature_2m_max[0],a.temperature_2m_min[0],a.precipitation_probability_max?.[0]??0,'']};}catch{return p;}}));renderWeather(outcomes,received===weatherPlaces.length);b.disabled=false;b.textContent='↻ 날씨 새로고침';}
 function setupEvents(){
  $('fontSizeBtn').addEventListener('click',()=>{const b=document.body.classList.toggle('large-text');$('fontSizeBtn').setAttribute('aria-pressed',String(b));state.large=b;save()});
  $('contrastBtn').addEventListener('click',()=>{const b=document.body.classList.toggle('high-contrast');$('contrastBtn').setAttribute('aria-pressed',String(b));state.contrast=b;save()});
  $('refreshWeather').addEventListener('click',loadWeather);
- $('daySections').addEventListener('click',e=>{const b=e.target.closest('button.stop-toggle');if(!b)return;const k=b.dataset.key;state.stops[k]=!state.stops[k];save();renderDays();notify('일정 완료 표시를 저장했습니다.');});
+ $('daySections').addEventListener('click',e=>{
+  const dayDone=e.target.closest('button.day-complete-toggle');
+  if(dayDone){
+    const id=dayDone.dataset.dayId;
+    state.dayCompleted[id]=!state.dayCompleted[id];
+    state.dayCollapsed[id]=!!state.dayCompleted[id];
+    save();renderDays();
+    const control=document.querySelector('#'+id+' .day-collapse-toggle');
+    control?.focus({preventScroll:true});
+    notify(state.dayCompleted[id]?'이날 여행을 완료하고 접었습니다.':'여행 완료 표시를 취소했습니다.');
+    return;
+  }
+  const dayExpand=e.target.closest('button.day-collapse-toggle');
+  if(dayExpand){
+    const id=dayExpand.dataset.dayId;
+    state.dayCollapsed[id]=!state.dayCollapsed[id];
+    save();renderDays();
+    document.querySelector('#'+id+' .day-collapse-toggle')?.focus({preventScroll:true});
+    return;
+  }
+  const b=e.target.closest('button.stop-toggle');
+  if(!b)return;
+  const k=b.dataset.key;
+  state.stops[k]=!state.stops[k];
+  save();renderDays();
+  document.querySelector('button.stop-toggle[data-key="'+k+'"]')?.focus({preventScroll:true});
+  notify('일정 완료 표시를 저장했습니다.');
+ });
  $('checklistGrid').addEventListener('change',e=>{if(!e.target.matches('[data-check]'))return;state.checks[e.target.dataset.check]=e.target.checked;save();renderChecks();});
  $('resetChecks').addEventListener('click',()=>{if(!confirm('준비물 체크 표시를 모두 지울까요?'))return;state.checks={};save();renderChecks();});
  $('fxRate').addEventListener('input',()=>{state.fx=$('fxRate').value;save();calculate();renderExpenses();});
